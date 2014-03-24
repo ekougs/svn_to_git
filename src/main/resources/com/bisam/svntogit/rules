@@ -1,0 +1,12 @@
+create repository b-one-modules
+end repository
+
+match /b-one-modules/trunk/
+  repository b-one-modules
+  branch master
+end match
+
+match /(branches|tags)/([^/]+)/
+  repository b-one-modules
+  branch \2
+end match
