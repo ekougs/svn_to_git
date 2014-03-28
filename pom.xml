@@ -54,6 +54,11 @@
           <source>1.7</source>
           <target>1.7</target>
         </configuration>
+        <executions>
+          <execution>
+           <id>default-compile</id>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>
