@@ -62,7 +62,7 @@ public class ArgumentsParser {
     }
 
     private String getDefaultFilePath() throws IOException {
-      String defaultDirectory = Main.class.getResource("").getFile();
+      String defaultDirectory = Files.getLocalFilePath(Main.class, "");
       File file = new File(defaultDirectory + "/authors");
       if (!file.exists()) {
         file.createNewFile();
