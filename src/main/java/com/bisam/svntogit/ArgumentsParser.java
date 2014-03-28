@@ -7,10 +7,10 @@ import java.util.Collections;
 import java.util.List;
 
 public class ArgumentsParser {
-  static final String FILE_OPTION = "--file";
-  static final String REPO_OPTION = "--repo";
-  static final String GIT_REPO_OPTION = "--git-repo";
-  static final String AUTHOR_FILE_PROVIDED = "--author-file-provided";
+  private static final String FILE_OPTION = "--file";
+  private static final String REPO_OPTION = "--repo";
+  private static final String GIT_REPO_OPTION = "--git-repo";
+  private static final String AUTHOR_FILE_PROVIDED = "--author-file-provided";
   private static final List<String> OPTIONS =
     Collections.unmodifiableList(Arrays.asList(FILE_OPTION, REPO_OPTION, GIT_REPO_OPTION, AUTHOR_FILE_PROVIDED));
 
@@ -19,22 +19,27 @@ public class ArgumentsParser {
     String gitRepo = "";
     String authorsFilePath = null;
     boolean authorsFileProvided = false;
-    for (int i = 0; i < args.length; i += 2) {
+    int step = 2;
+    for (int i = 0; i < args.length; i += step) {
       String option = args[i];
       if (!OPTIONS.contains(option)) {
         throw new IllegalArgumentException("Value and option must be separated with a space caracter. This option is not allowed : " + option + ".");
       }
       if (FILE_OPTION.equals(option)) {
         authorsFilePath = args[i + 1];
+        step = 2;
       }
       if (REPO_OPTION.equals(option)) {
         svnRepo = args[i + 1];
+        step = 2;
       }
       if (GIT_REPO_OPTION.equals(option)) {
         gitRepo = args[i + 1];
+        step = 2;
       }
       if (AUTHOR_FILE_PROVIDED.equals(option)) {
         authorsFileProvided = true;
+        step = 1;
       }
     }
     if (svnRepo == null) {
@@ -45,15 +50,15 @@ public class ArgumentsParser {
 
   static class Options {
     private final String svnRepo;
+    private final String authorsFilePath;
     private final String gitRepo;
     private final boolean authorsFileProvided;
-    private final String authorsFilePath;
 
     private Options(String svnRepo, String authorsFilePath, String gitRepo, boolean authorsFileProvided) throws IOException {
       this.svnRepo = svnRepo;
+      this.authorsFilePath = authorsFilePath == null ? getDefaultFilePath() : authorsFilePath;
       this.gitRepo = gitRepo;
       this.authorsFileProvided = authorsFileProvided;
-      this.authorsFilePath = authorsFilePath == null ? getDefaultFilePath() : authorsFilePath;
     }
 
     private String getDefaultFilePath() throws IOException {
@@ -73,11 +78,11 @@ public class ArgumentsParser {
       return authorsFilePath;
     }
 
-    public String getGitRepo() {
+    String getGitRepo() {
       return gitRepo;
     }
 
-    public boolean isAuthorsFileProvided() {
+    boolean isAuthorsFileProvided() {
       return authorsFileProvided;
     }
   }

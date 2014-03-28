@@ -19,6 +19,10 @@ class InputStreamToOutputs implements InputStreamReaderRunnable.InputStreamLineH
     return new InputStreamToOutputs(outputStream);
   }
 
+  static InputStreamToOutputs getErrorStreamHandler(String errorLogFileName) throws FileNotFoundException {
+    return init(new File(Files.getLocalFilePath(Main.class, errorLogFileName)));
+  }
+
   public InputStreamToOutputs add(PrintStream outputStream) {
     outputStreams.add(outputStream);
     return this;

@@ -1,6 +1,6 @@
 package com.bisam.svntogit;
 
-import java.io.FileNotFoundException;
+import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -12,15 +12,44 @@ public class Executors {
     return rt.exec(command);
   }
 
-  static int executeAll(Process process, InputStreamReaderRunnable.InputStreamLineHandler inputStreamHandler,
-                        InputStreamReaderRunnable.InputStreamLineHandler errorStreamHandler)
-    throws ExecutionException, InterruptedException, FileNotFoundException {
+  static Process executeCommand(String command, File file) throws IOException {
+    Runtime rt = Runtime.getRuntime();
+    return rt.exec(command, new String[0], file);
+  }
+
+  static int executeAll(String command, InputStreamReaderRunnable.InputStreamLineHandler inputStreamHandler, String errorLogFileName)
+    throws ExecutionException, InterruptedException, IOException {
+    return executeAll(command, inputStreamHandler, InputStreamToOutputs.getErrorStreamHandler(errorLogFileName));
+  }
+
+  static int executeAll(String command, InputStreamReaderRunnable.InputStreamLineHandler inputStreamHandler, String errorLogFileName, File file)
+    throws ExecutionException, InterruptedException, IOException {
+    return executeAll(command, inputStreamHandler, InputStreamToOutputs.getErrorStreamHandler(errorLogFileName), file);
+  }
+
+  private static int executeAll(String command, InputStreamReaderRunnable.InputStreamLineHandler inputStreamHandler,
+                                InputStreamReaderRunnable.InputStreamLineHandler errorStreamHandler, File file)
+    throws ExecutionException, InterruptedException, IOException {
+    Process process = executeCommand(command, file);
     ExecutorServiceShutter executorServiceShutter =
       executeInParallel(InputStreamReaderRunnable.init(process.getInputStream(), inputStreamHandler),
                         InputStreamReaderRunnable.init(process.getErrorStream(), errorStreamHandler));
 
     int processResult = process.waitFor();
-    executorServiceShutter.shutdown();
+    executorServiceShutter.waitForTasks().shutdown();
+    return processResult;
+  }
+
+  private static int executeAll(String command, InputStreamReaderRunnable.InputStreamLineHandler inputStreamHandler,
+                                InputStreamReaderRunnable.InputStreamLineHandler errorStreamHandler)
+    throws ExecutionException, InterruptedException, IOException {
+    Process process = executeCommand(command);
+    ExecutorServiceShutter executorServiceShutter =
+      executeInParallel(InputStreamReaderRunnable.init(process.getInputStream(), inputStreamHandler),
+                        InputStreamReaderRunnable.init(process.getErrorStream(), errorStreamHandler));
+
+    int processResult = process.waitFor();
+    executorServiceShutter.waitForTasks().shutdown();
     return processResult;
   }
 
@@ -49,10 +78,14 @@ public class Executors {
       this.futures = futures;
     }
 
-    public void shutdown() throws ExecutionException, InterruptedException {
+    public ExecutorServiceShutter waitForTasks() throws ExecutionException, InterruptedException {
       for (Future<Boolean> future : futures) {
         future.get();
       }
+      return this;
+    }
+
+    public void shutdown() {
       executorServiceToShut.shutdown();
     }
   }

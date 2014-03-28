@@ -11,28 +11,34 @@ public class Main {
   private static final String ERROR_LOG = "error.log";
 
   public static void main(String[] args) throws Exception {
+    long start;
     ArgumentsParser.Options options = ArgumentsParser.getOptions(args);
-    // Create author file if not provided
     if (!options.isAuthorsFileProvided()) {
+      start = new Date().getTime();
       boolean authorsFileReady = writeAuthorFile(options);
       if (!authorsFileReady) {
         return;
       }
+      System.out.append(Files.LINE_SEPARATOR);
+      System.out.append(Files.append("Author file : ", String.valueOf((new Date().getTime() - start) / 1000), " s")).append(Files.LINE_SEPARATOR);
+      System.out.append(Files.LINE_SEPARATOR);
     }
 
-    // Launch initial svn git clone
-    long start = new Date().getTime();
+    start = new Date().getTime();
     createGitRepo(options);
-    System.out.append("Clone : ").append(String.valueOf((new Date().getTime() - start) / 1000)).append(" s").append(Files.LINE_SEPARATOR);
+    System.out.append(Files.LINE_SEPARATOR);
+    System.out.append(Files.append("Clone : ", String.valueOf((new Date().getTime() - start) / 1000), " s")).append(Files.LINE_SEPARATOR);
+    System.out.append(Files.LINE_SEPARATOR);
 
     start = new Date().getTime();
-    // TODO create tags
-//    createTags();
-    System.out.append("Tags : ").append(String.valueOf((new Date().getTime() - start) / 1000)).append(" s").append(Files.LINE_SEPARATOR);
+    createTags(options.getGitRepo());
+    System.out.append(Files.LINE_SEPARATOR);
+    System.out.append(Files.append("Tags : ", String.valueOf((new Date().getTime() - start) / 1000), " s")).append(Files.LINE_SEPARATOR);
+    System.out.append(Files.LINE_SEPARATOR);
 
     start = new Date().getTime();
-    // TODO create branches
-    System.out.append("Branches : ").append(String.valueOf((new Date().getTime() - start) / 1000)).append(" s").append(Files.LINE_SEPARATOR);
+    createBranches(options.getGitRepo());
+    System.out.append(Files.append("Branches : ", String.valueOf((new Date().getTime() - start) / 1000), " s")).append(Files.LINE_SEPARATOR);
   }
 
   private static boolean writeAuthorFile(ArgumentsParser.Options options) throws IOException, InterruptedException, ExecutionException {
@@ -49,15 +55,21 @@ public class Main {
     String gitRepo = options.getGitRepo();
     deleteGitRepo(gitRepo);
 
-    Process process =
-      Executors.executeCommand(
-        "git svn clone --prefix=svn/ --no-metadata --authors-file=" + options.getAuthorsFilePath() + " " + options.getSvnRepo() +
-        " " + gitRepo + " --trunk=trunk --tags=tags --branches=branches");
-    Executors.executeAll(process, InputStreamToOutputs.init(System.out),
-                         InputStreamToOutputs.init(new File(Files.getLocalFilePath(Main.class, ERROR_LOG))));
+    String gitSvnCloneCommand =
+      Files.append("git svn clone --prefix=svn/ --no-metadata --authors-file=", options.getAuthorsFilePath(), " ", options.getSvnRepo(), " ", gitRepo,
+                   " --trunk=trunk --tags=tags --branches=branches");
+
+    Executors.executeAll(gitSvnCloneCommand, InputStreamToOutputs.init(System.out), ERROR_LOG);
   }
 
-  private static void createTags() throws IOException, ExecutionException, InterruptedException {
+  private static void createTags(String gitRepo) throws IOException, ExecutionException, InterruptedException {
+    String tagBranchListCommand = Files.append("git for-each-ref --format=%(refname) ", TagsCreator.PREFIX, "*");
+    Executors.executeAll(tagBranchListCommand, new TagsCreator(gitRepo), ERROR_LOG, new File(gitRepo));
+  }
+
+  private static void createBranches(String gitRepo) throws IOException, ExecutionException, InterruptedException {
+    String branchListCommand = Files.append("git for-each-ref --format=%(refname) ", BranchsCreator.PREFIX);
+    Executors.executeAll(branchListCommand, new BranchsCreator(gitRepo), ERROR_LOG, new File(gitRepo));
   }
 
   private static void deleteGitRepo(String gitRepo) throws IOException {

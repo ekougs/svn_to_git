@@ -14,3 +14,5 @@ OPTIONAL
 --git-repo <path> : Location where you want the Git repo directory to be generated. By default it is created in the directory from where the tool is run.
                           
 --author-file-provided : State that the author file is provided and does not need to be generated.
+
+It MUST be run with Java 7+ JVM.
