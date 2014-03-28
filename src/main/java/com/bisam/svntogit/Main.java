@@ -22,24 +22,17 @@ public class Main {
 
     // Launch initial svn git clone
     long start = new Date().getTime();
-    String gitRepo = options.getGitRepo();
-    deleteGitRepo(gitRepo);
+    createGitRepo(options);
+    System.out.append("Clone : ").append(String.valueOf((new Date().getTime() - start) / 1000)).append(" s").append(Files.LINE_SEPARATOR);
 
-    Runtime rt = Runtime.getRuntime();
-    Process process =
-      rt.exec("svn-all-fast-export --identify-map " + options.getAuthorsFilePath() + " --stats " + options.getSvnRepo() +
-              " " + gitRepo + " --rules rules");
-//      rt.exec("git svn clone --prefix=svn/ --no-metadata --authors-file=" + options.getAuthorsFilePath() + " " + options.getSvnRepo() +
-//              " " + gitRepo + " --trunk=trunk --tags=tags --branches=branches");
+    start = new Date().getTime();
+    // TODO create tags
+//    createTags();
+    System.out.append("Tags : ").append(String.valueOf((new Date().getTime() - start) / 1000)).append(" s").append(Files.LINE_SEPARATOR);
 
-    Runnable shutdownPoolRunnable =
-      ExecutorUtils.executeAll(InputStreamToOutputsRunnable.init(process.getInputStream(), System.out),
-                               InputStreamToOutputsRunnable.init(process.getErrorStream(), new File(Files.getLocalFilePath(Main.class, ERROR_LOG))));
-
-    process.waitFor();
-    shutdownPoolRunnable.run();
-
-    System.out.append("Clone : ").append(String.valueOf((new Date().getTime() - start) / 1000)).append(" s");
+    start = new Date().getTime();
+    // TODO create branches
+    System.out.append("Branches : ").append(String.valueOf((new Date().getTime() - start) / 1000)).append(" s").append(Files.LINE_SEPARATOR);
   }
 
   private static boolean writeAuthorFile(ArgumentsParser.Options options) throws IOException, InterruptedException, ExecutionException {
@@ -50,6 +43,21 @@ public class Main {
     AuthorExtractor.Authors authors = AuthorExtractor.init(SvnLogWriter.getSvnLogFilePath()).getAuthors();
     AuthorFileWriter.init(options.getAuthorsFilePath()).write(authors);
     return true;
+  }
+
+  private static void createGitRepo(ArgumentsParser.Options options) throws IOException, ExecutionException, InterruptedException {
+    String gitRepo = options.getGitRepo();
+    deleteGitRepo(gitRepo);
+
+    Process process =
+      Executors.executeCommand(
+        "git svn clone --prefix=svn/ --no-metadata --authors-file=" + options.getAuthorsFilePath() + " " + options.getSvnRepo() +
+        " " + gitRepo + " --trunk=trunk --tags=tags --branches=branches");
+    Executors.executeAll(process, InputStreamToOutputs.init(System.out),
+                         InputStreamToOutputs.init(new File(Files.getLocalFilePath(Main.class, ERROR_LOG))));
+  }
+
+  private static void createTags() throws IOException, ExecutionException, InterruptedException {
   }
 
   private static void deleteGitRepo(String gitRepo) throws IOException {

@@ -2,9 +2,6 @@ package com.bisam.svntogit;
 
 import junit.framework.TestCase;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.Iterator;
 
 public class AuthorExtractorTest extends TestCase {
