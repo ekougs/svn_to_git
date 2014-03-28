@@ -19,26 +19,20 @@ public class Main {
       if (!authorsFileReady) {
         return;
       }
-      System.out.append(Files.LINE_SEPARATOR);
-      System.out.append(Files.append("Author file : ", String.valueOf((new Date().getTime() - start) / 1000), " s")).append(Files.LINE_SEPARATOR);
-      System.out.append(Files.LINE_SEPARATOR);
+      logStep(start, "Author file : ");
     }
 
     start = new Date().getTime();
     createGitRepo(options);
-    System.out.append(Files.LINE_SEPARATOR);
-    System.out.append(Files.append("Clone : ", String.valueOf((new Date().getTime() - start) / 1000), " s")).append(Files.LINE_SEPARATOR);
-    System.out.append(Files.LINE_SEPARATOR);
+    logStep(start, "Clone : ");
 
     start = new Date().getTime();
     createTags(options.getGitRepo());
-    System.out.append(Files.LINE_SEPARATOR);
-    System.out.append(Files.append("Tags : ", String.valueOf((new Date().getTime() - start) / 1000), " s")).append(Files.LINE_SEPARATOR);
-    System.out.append(Files.LINE_SEPARATOR);
+    logStep(start, "Tags : ");
 
     start = new Date().getTime();
     createBranches(options.getGitRepo());
-    System.out.append(Files.append("Branches : ", String.valueOf((new Date().getTime() - start) / 1000), " s")).append(Files.LINE_SEPARATOR);
+    logStep(start, "Branches : ");
   }
 
   private static boolean writeAuthorFile(ArgumentsParser.Options options) throws IOException, InterruptedException, ExecutionException {
@@ -77,5 +71,11 @@ public class Main {
     if (gitRepoDirectory.exists()) {
       FileUtils.deleteDirectory(gitRepoDirectory);
     }
+  }
+
+  private static void logStep(long start, String step) {
+    System.out.append(Files.LINE_SEPARATOR);
+    System.out.append(Files.append(step, String.valueOf((new Date().getTime() - start) / 1000), " s")).append(Files.LINE_SEPARATOR);
+    System.out.append(Files.LINE_SEPARATOR);
   }
 }
