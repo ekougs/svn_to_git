@@ -1,7 +1,14 @@
 package com.bisam.svntogit;
 
-/**
- * Created by rd on 31/03/14.
- */
 public class Strings {
+    static String append(String... stringsToAppend) {
+        if (stringsToAppend == null) {
+            return "";
+        }
+        StringBuilder appendedStringBuilder = new StringBuilder();
+        for (String stringToAppend : stringsToAppend) {
+            appendedStringBuilder.append(stringToAppend);
+        }
+        return appendedStringBuilder.toString();
+    }
 }

@@ -19,10 +19,10 @@ class BranchsCreator implements InputStreamReaderRunnable.InputStreamLineHandler
     }
     String branch = originalBranch.substring(PREFIX.length());
     try {
-      String gitBranchCommand = Files.append("git branch -t ", branch, " ", originalBranch);
+      String gitBranchCommand = Strings.append("git branch -t ", branch, " ", originalBranch);
       System.out.append(gitBranchCommand).append(Files.LINE_SEPARATOR);
       Executors.executeCommand(gitBranchCommand, gitRepo).waitFor();
-      String updateRefTagCommand = Files.append("git update-ref -d ", originalBranch);
+      String updateRefTagCommand = Strings.append("git update-ref -d ", originalBranch);
       System.out.append(updateRefTagCommand).append(Files.LINE_SEPARATOR);
       Executors.executeCommand(updateRefTagCommand, gitRepo).waitFor();
       System.out.append(Files.LINE_SEPARATOR);
