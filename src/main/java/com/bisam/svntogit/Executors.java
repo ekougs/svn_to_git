@@ -31,6 +31,12 @@ public class Executors {
                                 InputStreamReaderRunnable.InputStreamLineHandler errorStreamHandler, File file)
     throws ExecutionException, InterruptedException, IOException {
     Process process = executeCommand(command, file);
+    return processAll(process, inputStreamHandler, errorStreamHandler);
+  }
+
+  static int processAll(Process process, InputStreamReaderRunnable.InputStreamLineHandler inputStreamHandler,
+                        InputStreamReaderRunnable.InputStreamLineHandler errorStreamHandler)
+    throws ExecutionException, InterruptedException, IOException {
     ExecutorServiceShutter executorServiceShutter =
       executeInParallel(InputStreamReaderRunnable.init(process.getInputStream(), inputStreamHandler),
                         InputStreamReaderRunnable.init(process.getErrorStream(), errorStreamHandler));

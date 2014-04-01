@@ -23,7 +23,7 @@ public class ArgumentsParser {
     for (int i = 0; i < args.length; i += step) {
       String option = args[i];
       if (!OPTIONS.contains(option)) {
-        throw new IllegalArgumentException("Value and option must be separated with a space caracter. This option is not allowed : " + option + ".");
+        throw new IllegalArgumentException("Value and option must be separated with a space character. This option is not allowed : " + option + ".");
       }
       if (FILE_OPTION.equals(option)) {
         authorsFilePath = args[i + 1];

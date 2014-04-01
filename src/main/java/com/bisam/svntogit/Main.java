@@ -8,7 +8,7 @@ import java.util.Date;
 import java.util.concurrent.ExecutionException;
 
 public class Main {
-  private static final String ERROR_LOG = "error.log";
+  private static final String ERROR_LOG = "error_main.log";
 
   public static void main(String[] args) throws Exception {
     long start;
@@ -50,19 +50,19 @@ public class Main {
     deleteGitRepo(gitRepo);
 
     String gitSvnCloneCommand =
-      Files.append("git svn clone --prefix=svn/ --no-metadata --authors-file=", options.getAuthorsFilePath(), " ", options.getSvnRepo(), " ", gitRepo,
-                   " --trunk=trunk --tags=tags --branches=branches");
+      Strings.append("git svn clone --prefix=svn/ --no-metadata --authors-file=", options.getAuthorsFilePath(), " ", options.getSvnRepo(), " ", gitRepo,
+              " --trunk=trunk --tags=tags --branches=branches");
 
     Executors.executeAll(gitSvnCloneCommand, InputStreamToOutputs.init(System.out), ERROR_LOG);
   }
 
-  private static void createTags(String gitRepo) throws IOException, ExecutionException, InterruptedException {
-    String tagBranchListCommand = Files.append("git for-each-ref --format=%(refname) ", TagsCreator.PREFIX, "*");
+  static void createTags(String gitRepo) throws IOException, ExecutionException, InterruptedException {
+    String tagBranchListCommand = Strings.append("git for-each-ref --format=%(refname) ", TagsCreator.PREFIX, "*");
     Executors.executeAll(tagBranchListCommand, new TagsCreator(gitRepo), ERROR_LOG, new File(gitRepo));
   }
 
   private static void createBranches(String gitRepo) throws IOException, ExecutionException, InterruptedException {
-    String branchListCommand = Files.append("git for-each-ref --format=%(refname) ", BranchsCreator.PREFIX);
+    String branchListCommand = Strings.append("git for-each-ref --format=%(refname) ", BranchsCreator.PREFIX);
     Executors.executeAll(branchListCommand, new BranchsCreator(gitRepo), ERROR_LOG, new File(gitRepo));
   }
 
@@ -73,9 +73,9 @@ public class Main {
     }
   }
 
-  private static void logStep(long start, String step) {
+  static void logStep(long start, String step) {
     System.out.append(Files.LINE_SEPARATOR);
-    System.out.append(Files.append(step, String.valueOf((new Date().getTime() - start) / 1000), " s")).append(Files.LINE_SEPARATOR);
+    System.out.append(Strings.append(step, String.valueOf((new Date().getTime() - start) / 1000), " s")).append(Files.LINE_SEPARATOR);
     System.out.append(Files.LINE_SEPARATOR);
   }
 }

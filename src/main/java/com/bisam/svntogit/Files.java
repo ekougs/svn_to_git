@@ -10,14 +10,4 @@ public class Files {
     return localDirectory + File.separatorChar + fileName;
   }
 
-  static String append(String... stringsToAppend) {
-    if (stringsToAppend == null) {
-      return "";
-    }
-    StringBuilder appendedStringBuilder = new StringBuilder();
-    for (String stringToAppend : stringsToAppend) {
-      appendedStringBuilder.append(stringToAppend);
-    }
-    return appendedStringBuilder.toString();
-  }
 }
