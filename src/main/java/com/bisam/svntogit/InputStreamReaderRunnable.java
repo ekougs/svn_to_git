@@ -56,5 +56,15 @@ class InputStreamReaderRunnable implements Runnable {
     void handleLine(String inputStreamLine);
 
     void close();
+
+    InputStreamLineHandler NULL = new InputStreamLineHandler() {
+      @Override
+      public void handleLine(String inputStreamLine) {
+      }
+
+      @Override
+      public void close() {
+      }
+    };
   }
 }

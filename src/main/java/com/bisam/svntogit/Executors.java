@@ -8,8 +8,7 @@ import java.util.concurrent.Future;
 
 public class Executors {
   static Process executeCommand(String command) throws IOException {
-    Runtime rt = Runtime.getRuntime();
-    return rt.exec(command);
+    return executeCommand(command, new File(Files.getLocalDirectory(Executors.class)));
   }
 
   static Process executeCommand(String command, File file) throws IOException {
@@ -61,7 +60,7 @@ public class Executors {
 
   static ExecutorServiceShutter executeInParallel(Runnable... runnables)
     throws ExecutionException, InterruptedException {
-    if (runnables == null) {
+    if (runnables == null || runnables.length == 0) {
       throw new IllegalArgumentException("Must submit at least one runnable");
     }
     int numberOfThreads = runnables.length;

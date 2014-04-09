@@ -1,10 +1,14 @@
 package com.bisam.svntogit;
 
-import junit.framework.TestCase;
+import org.junit.Test;
 
 import java.util.Iterator;
 
-public class AuthorExtractorTest extends TestCase {
+import static junit.framework.TestCase.*;
+
+public class AuthorExtractorTest {
+
+  @Test
   public void testSampleFile() throws Exception {
     AuthorExtractor.Authors authors = AuthorExtractor.init(AuthorExtractorTest.class.getResource("log.txt").getPath()).getAuthors();
     assertThat(authors)
