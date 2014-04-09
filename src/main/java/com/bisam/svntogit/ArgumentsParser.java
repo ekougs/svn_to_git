@@ -65,7 +65,9 @@ public class ArgumentsParser {
       String defaultDirectory = Files.getLocalFilePath(Main.class, "");
       File file = new File(defaultDirectory + "/authors");
       if (!file.exists()) {
-        file.createNewFile();
+        if (!file.createNewFile()) {
+          throw new IOException("Could not create authors file");
+        }
       }
       return file.getAbsolutePath();
     }
