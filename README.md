@@ -6,6 +6,7 @@ MANDATORY
 
 --repo <URL> : The svn repository URL.
 
+--author-mail : Provide an unique author mail for all users
 
 OPTIONAL
 

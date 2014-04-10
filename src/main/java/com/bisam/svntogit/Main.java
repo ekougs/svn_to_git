@@ -35,13 +35,18 @@ public class Main {
     logStep(start, "Branches : ");
   }
 
+  static void createTags(String gitRepo) throws IOException, ExecutionException, InterruptedException {
+    String tagBranchListCommand = Strings.append("git for-each-ref --format=%(refname) ", TagsCreator.PREFIX, "*");
+    Executors.executeAll(tagBranchListCommand, new TagsCreator(gitRepo), ERROR_LOG, new File(gitRepo));
+  }
+
   private static boolean writeAuthorFile(ArgumentsParser.Options options) throws IOException, InterruptedException, ExecutionException {
     boolean hasWritten = SvnLogWriter.init(options.getSvnRepo()).write();
     if (!hasWritten) {
       return false;
     }
     AuthorExtractor.Authors authors = AuthorExtractor.init(SvnLogWriter.getSvnLogFilePath()).getAuthors();
-    AuthorFileWriter.init(options.getAuthorsFilePath()).write(authors);
+    AuthorFileWriter.init(options.getAuthorsFilePath(), options.getMail()).write(authors);
     return true;
   }
 
@@ -50,15 +55,10 @@ public class Main {
     deleteGitRepo(gitRepo);
 
     String gitSvnCloneCommand =
-      Strings.append("git svn clone --prefix=svn/ --no-metadata --authors-file=", options.getAuthorsFilePath(), " ", options.getSvnRepo(), " ", gitRepo,
-              " --trunk=trunk --tags=tags --branches=branches");
+      Strings.append("git svn clone --prefix=svn/ --no-metadata --authors-file=", options.getAuthorsFilePath(), " ", options.getSvnRepo(),
+                     " ", gitRepo, " --trunk=trunk --tags=tags --branches=branches");
 
     Executors.executeAll(gitSvnCloneCommand, InputStreamToOutputs.init(System.out), ERROR_LOG);
-  }
-
-  static void createTags(String gitRepo) throws IOException, ExecutionException, InterruptedException {
-    String tagBranchListCommand = Strings.append("git for-each-ref --format=%(refname) ", TagsCreator.PREFIX, "*");
-    Executors.executeAll(tagBranchListCommand, new TagsCreator(gitRepo), ERROR_LOG, new File(gitRepo));
   }
 
   private static void createBranches(String gitRepo) throws IOException, ExecutionException, InterruptedException {

@@ -2,63 +2,70 @@ package com.bisam.svntogit;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 public class ArgumentsParser {
-  private static final String FILE_OPTION = "--file";
-  private static final String REPO_OPTION = "--repo";
-  private static final String GIT_REPO_OPTION = "--git-repo";
-  private static final String AUTHOR_FILE_PROVIDED = "--author-file-provided";
-  private static final List<String> OPTIONS =
-    Collections.unmodifiableList(Arrays.asList(FILE_OPTION, REPO_OPTION, GIT_REPO_OPTION, AUTHOR_FILE_PROVIDED));
 
   static Options getOptions(String[] args) throws IOException {
-    String svnRepo = null;
-    String gitRepo = "";
-    String authorsFilePath = null;
-    boolean authorsFileProvided = false;
-    int step = 2;
-    for (int i = 0; i < args.length; i += step) {
+    Options options = new Options();
+    Parameter parameter;
+    for (int i = 0; i < args.length; i += parameter.step) {
       String option = args[i];
-      if (!OPTIONS.contains(option)) {
+      parameter = Parameter.get(option);
+      if (parameter == null) {
         throw new IllegalArgumentException("Value and option must be separated with a space character. This option is not allowed : " + option + ".");
       }
-      if (FILE_OPTION.equals(option)) {
-        authorsFilePath = args[i + 1];
-        step = 2;
-      }
-      if (REPO_OPTION.equals(option)) {
-        svnRepo = args[i + 1];
-        step = 2;
-      }
-      if (GIT_REPO_OPTION.equals(option)) {
-        gitRepo = args[i + 1];
-        step = 2;
-      }
-      if (AUTHOR_FILE_PROVIDED.equals(option)) {
-        authorsFileProvided = true;
-        step = 1;
-      }
+      options.set(parameter, parameter.getValue(args, i));
     }
-    if (svnRepo == null) {
-      throw new IllegalArgumentException(REPO_OPTION + " is mandatory.");
-    }
-    return new Options(svnRepo, authorsFilePath, gitRepo, authorsFileProvided);
+    options.check();
+    return options;
   }
 
   static class Options {
-    private final String svnRepo;
-    private final String authorsFilePath;
-    private final String gitRepo;
-    private final boolean authorsFileProvided;
+    private final Map<String, String> optionValues = new HashMap<>();
 
-    private Options(String svnRepo, String authorsFilePath, String gitRepo, boolean authorsFileProvided) throws IOException {
-      this.svnRepo = svnRepo;
-      this.authorsFilePath = authorsFilePath == null ? getDefaultFilePath() : authorsFilePath;
-      this.gitRepo = gitRepo;
-      this.authorsFileProvided = authorsFileProvided;
+    private Options() {
+    }
+
+    String getSvnRepo() {
+      return optionValues.get(Parameter.SVN_REPO_OPTION.name);
+    }
+
+    String getAuthorsFilePath() throws IOException {
+      String fileOptionName = Parameter.FILE_OPTION.name;
+      return optionValues.containsKey(fileOptionName) ? optionValues.get(fileOptionName) : getDefaultFilePath();
+    }
+
+    String getGitRepo() {
+      return optionValues.get(Parameter.GIT_REPO_OPTION.name);
+    }
+
+    boolean isAuthorsFileProvided() {
+      return optionValues.containsKey(Parameter.AUTHOR_FILE_PROVIDED.name);
+    }
+
+    String getMail() {
+      return optionValues.get(Parameter.AUTHOR_MAIL.name);
+    }
+
+    private void set(Parameter parameter, String value) {
+      optionValues.put(parameter.name, value);
+    }
+
+    private void check() {
+      for (Parameter parameter : Parameter.values()) {
+        String parameterName = parameter.name;
+        if (parameter.mandatory && isEmptyValue(parameterName)) {
+          throw new IllegalArgumentException(parameterName + " is mandatory.");
+        }
+      }
+    }
+
+    private boolean isEmptyValue(String parameterName) {
+      return !optionValues.containsKey(parameterName) ||
+             optionValues.get(parameterName) == null ||
+             "".equals(optionValues.get(parameterName).trim());
     }
 
     private String getDefaultFilePath() throws IOException {
@@ -71,21 +78,53 @@ public class ArgumentsParser {
       }
       return file.getAbsolutePath();
     }
+  }
 
-    String getSvnRepo() {
-      return svnRepo;
+  private static enum Parameter {
+    FILE_OPTION("--file"),
+    SVN_REPO_OPTION("--repo", true),
+    GIT_REPO_OPTION("--git-repo"),
+    AUTHOR_FILE_PROVIDED("--author-file-provided", Boolean.TRUE.toString()),
+    AUTHOR_MAIL("--author-mail", true);
+
+    private final String name;
+    private final int step;
+    private final String value;
+    private final boolean mandatory;
+
+    private Parameter(String name) {
+      this(name, 2, "", false);
     }
 
-    String getAuthorsFilePath() {
-      return authorsFilePath;
+    private Parameter(String name, boolean mandatory) {
+      this(name, 2, "", mandatory);
     }
 
-    String getGitRepo() {
-      return gitRepo;
+    private Parameter(String name, String value) {
+      this(name, 1, value, false);
     }
 
-    boolean isAuthorsFileProvided() {
-      return authorsFileProvided;
+    private Parameter(String name, int step, String value, boolean mandatory) {
+      this.name = name;
+      this.step = step;
+      this.value = value;
+      this.mandatory = mandatory;
+    }
+
+    private static Parameter get(String option) {
+      for (Parameter parameter : Parameter.values()) {
+        if (parameter.name.equals(option)) {
+          return parameter;
+        }
+      }
+      return null;
+    }
+
+    private String getValue(String[] args, int parameterPosition) {
+      if (step == 2) {
+        return args[parameterPosition + 1];
+      }
+      return value;
     }
   }
 }
