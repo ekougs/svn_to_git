@@ -1,9 +1,11 @@
 package com.bisam.svntogit;
 
 public class Strings {
-    static String append(String... stringsToAppend) {
+  public static final String EMPTY = "";
+
+  static String append(String... stringsToAppend) {
         if (stringsToAppend == null) {
-            return "";
+            return Strings.EMPTY;
         }
         StringBuilder appendedStringBuilder = new StringBuilder();
         for (String stringToAppend : stringsToAppend) {

@@ -21,9 +21,10 @@ public class ArgumentsParserTest {
 
   @Test
   public void testOnlyMandatoryParameter() throws Exception {
-    ArgumentsParser.Options options = ArgumentsParser.getOptions(new String[]{"--repo", "nimportequoi"});
+    ArgumentsParser.Options options = ArgumentsParser.getOptions(new String[]{"--repo", "nimportequoi", "--author-mail", "john@doe.com"});
     assertEquals("nimportequoi", options.getSvnRepo());
-    assertEquals("", options.getGitRepo());
+    assertEquals("john@doe.com", options.getMail());
+    assertEquals(Strings.EMPTY, options.getGitRepo());
     assertEquals(Files.getLocalFilePath(ArgumentsParserTest.class, "authors"), options.getAuthorsFilePath());
     assertFalse(options.isAuthorsFileProvided());
   }
@@ -38,11 +39,12 @@ public class ArgumentsParserTest {
   @Test
   public void testAllParameters() throws Exception {
     ArgumentsParser.Options options =
-      ArgumentsParser.getOptions(new String[]{"--author-file-provided", "--repo", "repoquoi",
+      ArgumentsParser.getOptions(new String[]{"--author-file-provided", "--author-mail", "john@doe.com", "--repo", "repoquoi",
                                               "--file", "authorfilequoi",
                                               "--git-repo", "gitquoi"});
     assertEquals("repoquoi", options.getSvnRepo());
     assertEquals("gitquoi", options.getGitRepo());
+    assertEquals("john@doe.com", options.getMail());
     assertEquals("authorfilequoi", options.getAuthorsFilePath());
     assertTrue(options.isAuthorsFileProvided());
   }

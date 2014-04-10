@@ -14,13 +14,13 @@ public class FilesTest {
 
   @Test
   public void testLocalDirectory() throws Exception {
-    Path targetPath = Paths.get(FilesTest.class.getResource("").toURI()).getParent().getParent().getParent().getParent();
+    Path targetPath = Paths.get(FilesTest.class.getResource(Strings.EMPTY).toURI()).getParent().getParent().getParent().getParent();
     assertEquals(targetPath.toFile(), new File(Files.getLocalDirectory(FilesTest.class)));
   }
 
   @Test
   public void testLocalFilePath() throws Exception {
-    Path targetPath = Paths.get(FilesTest.class.getResource("").toURI()).getParent().getParent().getParent().getParent();
+    Path targetPath = Paths.get(FilesTest.class.getResource(Strings.EMPTY).toURI()).getParent().getParent().getParent().getParent();
     Path tempPath = Paths.get(targetPath.toString(), TEMP_TXT);
     assertEquals(tempPath.toFile(), new File(Files.getLocalFilePath(FilesTest.class, TEMP_TXT)));
   }

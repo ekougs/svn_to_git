@@ -7,12 +7,12 @@ import static junit.framework.TestCase.assertEquals;
 public class StringsTest {
   @Test
   public void testApppendingVoid() throws Exception {
-    assertEquals("", Strings.append());
+    assertEquals(Strings.EMPTY, Strings.append());
   }
 
   @Test
   public void testApppendingNull() throws Exception {
-    assertEquals("", Strings.append(null));
+    assertEquals(Strings.EMPTY, Strings.append(null));
   }
 
   @Test

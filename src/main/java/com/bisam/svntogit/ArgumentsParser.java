@@ -34,11 +34,12 @@ public class ArgumentsParser {
 
     String getAuthorsFilePath() throws IOException {
       String fileOptionName = Parameter.FILE_OPTION.name;
-      return optionValues.containsKey(fileOptionName) ? optionValues.get(fileOptionName) : getDefaultFilePath();
+      return isEmptyValue(fileOptionName) ? getDefaultFilePath() : optionValues.get(fileOptionName);
     }
 
     String getGitRepo() {
-      return optionValues.get(Parameter.GIT_REPO_OPTION.name);
+      String gitRepoOptionName = Parameter.GIT_REPO_OPTION.name;
+      return isEmptyValue(gitRepoOptionName) ? Strings.EMPTY : optionValues.get(gitRepoOptionName);
     }
 
     boolean isAuthorsFileProvided() {
@@ -65,11 +66,11 @@ public class ArgumentsParser {
     private boolean isEmptyValue(String parameterName) {
       return !optionValues.containsKey(parameterName) ||
              optionValues.get(parameterName) == null ||
-             "".equals(optionValues.get(parameterName).trim());
+             Strings.EMPTY.equals(optionValues.get(parameterName).trim());
     }
 
-    private String getDefaultFilePath() throws IOException {
-      String defaultDirectory = Files.getLocalFilePath(Main.class, "");
+    private static String getDefaultFilePath() throws IOException {
+      String defaultDirectory = Files.getLocalFilePath(Main.class, Strings.EMPTY);
       File file = new File(defaultDirectory + "/authors");
       if (!file.exists()) {
         if (!file.createNewFile()) {
@@ -93,11 +94,11 @@ public class ArgumentsParser {
     private final boolean mandatory;
 
     private Parameter(String name) {
-      this(name, 2, "", false);
+      this(name, 2, Strings.EMPTY, false);
     }
 
     private Parameter(String name, boolean mandatory) {
-      this(name, 2, "", mandatory);
+      this(name, 2, Strings.EMPTY, mandatory);
     }
 
     private Parameter(String name, String value) {
