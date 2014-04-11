@@ -7,21 +7,21 @@ import java.io.PrintWriter;
 
 public class AuthorFileWriter {
   private final String authorFilePath;
-  private final String authorMail;
+  private final MailSupplier mailSupplier;
 
-  private AuthorFileWriter(String authorFilePath, String authorMail) {
+  private AuthorFileWriter(String authorFilePath, MailSupplier mailSupplier) {
     this.authorFilePath = authorFilePath;
-    this.authorMail = authorMail;
+    this.mailSupplier = mailSupplier;
   }
 
-  static AuthorFileWriter init(String authorFilePath, String authorMail) {
-    return new AuthorFileWriter(authorFilePath, authorMail);
+  static AuthorFileWriter init(String authorFilePath, MailSupplier mailSupplier) {
+    return new AuthorFileWriter(authorFilePath, mailSupplier);
   }
 
   void write(AuthorExtractor.Authors authors) throws IOException {
     try (PrintWriter authorsPrintWriter = new PrintWriter(new BufferedWriter(new FileWriter(authorFilePath)))) {
       for (String author : authors) {
-        authorsPrintWriter.println(getAuthorLine(author, authorMail));
+        authorsPrintWriter.println(getAuthorLine(author, mailSupplier.getMail(author)));
       }
     }
   }

@@ -13,4 +13,8 @@ public class Strings {
         }
         return appendedStringBuilder.toString();
     }
+
+  static boolean isEmptyString(String value) {
+    return value == null || EMPTY.equals(value.trim());
+  }
 }

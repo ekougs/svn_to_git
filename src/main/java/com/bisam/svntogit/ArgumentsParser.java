@@ -39,7 +39,7 @@ public class ArgumentsParser {
 
     String getGitRepo() {
       String gitRepoOptionName = Parameter.GIT_REPO_OPTION.name;
-      return isEmptyValue(gitRepoOptionName) ? Strings.EMPTY : optionValues.get(gitRepoOptionName);
+      return getOptionalField(gitRepoOptionName);
     }
 
     boolean isAuthorsFileProvided() {
@@ -47,14 +47,15 @@ public class ArgumentsParser {
     }
 
     String getMail() {
-      return optionValues.get(Parameter.AUTHOR_MAIL.name);
+      String authorMailParameterName = Parameter.AUTHOR_MAIL.name;
+      return getOptionalField(authorMailParameterName);
     }
 
-    private void set(Parameter parameter, String value) {
+    void set(Parameter parameter, String value) {
       optionValues.put(parameter.name, value);
     }
 
-    private void check() {
+    void check() {
       for (Parameter parameter : Parameter.values()) {
         String parameterName = parameter.name;
         if (parameter.mandatory && isEmptyValue(parameterName)) {
@@ -63,10 +64,14 @@ public class ArgumentsParser {
       }
     }
 
+    private String getOptionalField(String authorMailParameterName) {
+      return isEmptyValue(authorMailParameterName) ? Strings.EMPTY : optionValues.get(authorMailParameterName);
+    }
+
     private boolean isEmptyValue(String parameterName) {
       return !optionValues.containsKey(parameterName) ||
              optionValues.get(parameterName) == null ||
-             Strings.EMPTY.equals(optionValues.get(parameterName).trim());
+             Strings.isEmptyString(optionValues.get(parameterName));
     }
 
     private static String getDefaultFilePath() throws IOException {
@@ -81,12 +86,12 @@ public class ArgumentsParser {
     }
   }
 
-  private static enum Parameter {
+  static enum Parameter {
     FILE_OPTION("--file"),
     SVN_REPO_OPTION("--repo", true),
     GIT_REPO_OPTION("--git-repo"),
     AUTHOR_FILE_PROVIDED("--author-file-provided", Boolean.TRUE.toString()),
-    AUTHOR_MAIL("--author-mail", true);
+    AUTHOR_MAIL("--author-mail");
 
     private final String name;
     private final int step;
@@ -110,6 +115,10 @@ public class ArgumentsParser {
       this.step = step;
       this.value = value;
       this.mandatory = mandatory;
+    }
+
+    public String getName() {
+      return name;
     }
 
     private static Parameter get(String option) {

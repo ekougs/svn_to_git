@@ -7,15 +7,36 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.concurrent.ExecutionException;
 
+import static com.bisam.svntogit.Strings.append;
+import static com.bisam.svntogit.Strings.isEmptyString;
+
 public class Main {
   private static final String ERROR_LOG = "error_main.log";
 
   public static void main(String[] args) throws Exception {
-    long start;
+    launchGitRepoCreation(args);
+  }
+
+  private static void launchGitRepoCreation(String[] args) throws IOException, InterruptedException, ExecutionException {
     ArgumentsParser.Options options = ArgumentsParser.getOptions(args);
+    if (isEmptyString(options.getMail())) {
+      throw new IllegalArgumentException(
+        append("E-mail must be supplied via ", ArgumentsParser.Parameter.AUTHOR_MAIL.getName(), " option if you don't provide a mail supplier."));
+    }
+    launchGitRepoCreation(options, new SingleMailSupplier(options.getMail()));
+  }
+
+  public static void launchGitRepoCreation(String[] args, MailSupplier mailSupplier) throws IOException, InterruptedException, ExecutionException {
+    ArgumentsParser.Options options = ArgumentsParser.getOptions(args);
+    launchGitRepoCreation(options, mailSupplier);
+  }
+
+  private static void launchGitRepoCreation(ArgumentsParser.Options options, MailSupplier mailSupplier)
+    throws IOException, InterruptedException, ExecutionException {
+    long start;
     if (!options.isAuthorsFileProvided()) {
       start = new Date().getTime();
-      boolean authorsFileReady = writeAuthorFile(options);
+      boolean authorsFileReady = writeAuthorFile(options, mailSupplier);
       if (!authorsFileReady) {
         return;
       }
@@ -36,17 +57,18 @@ public class Main {
   }
 
   static void createTags(String gitRepo) throws IOException, ExecutionException, InterruptedException {
-    String tagBranchListCommand = Strings.append("git for-each-ref --format=%(refname) ", TagsCreator.PREFIX, "*");
+    String tagBranchListCommand = append("git for-each-ref --format=%(refname) ", TagsCreator.PREFIX, "*");
     Executors.executeAll(tagBranchListCommand, new TagsCreator(gitRepo), ERROR_LOG, new File(gitRepo));
   }
 
-  private static boolean writeAuthorFile(ArgumentsParser.Options options) throws IOException, InterruptedException, ExecutionException {
+  private static boolean writeAuthorFile(ArgumentsParser.Options options, MailSupplier mailSupplier)
+    throws IOException, InterruptedException, ExecutionException {
     boolean hasWritten = SvnLogWriter.init(options.getSvnRepo()).write();
     if (!hasWritten) {
       return false;
     }
     AuthorExtractor.Authors authors = AuthorExtractor.init(SvnLogWriter.getSvnLogFilePath()).getAuthors();
-    AuthorFileWriter.init(options.getAuthorsFilePath(), options.getMail()).write(authors);
+    AuthorFileWriter.init(options.getAuthorsFilePath(), mailSupplier).write(authors);
     return true;
   }
 
@@ -55,14 +77,14 @@ public class Main {
     deleteGitRepo(gitRepo);
 
     String gitSvnCloneCommand =
-      Strings.append("git svn clone --prefix=svn/ --no-metadata --authors-file=", options.getAuthorsFilePath(), " ", options.getSvnRepo(),
-                     " ", gitRepo, " --trunk=trunk --tags=tags --branches=branches");
+      append("git svn clone --prefix=svn/ --no-metadata --authors-file=", options.getAuthorsFilePath(), " ", options.getSvnRepo(),
+             " ", gitRepo, " --trunk=trunk --tags=tags --branches=branches");
 
     Executors.executeAll(gitSvnCloneCommand, InputStreamToOutputs.init(System.out), ERROR_LOG);
   }
 
   private static void createBranches(String gitRepo) throws IOException, ExecutionException, InterruptedException {
-    String branchListCommand = Strings.append("git for-each-ref --format=%(refname) ", BranchsCreator.PREFIX);
+    String branchListCommand = append("git for-each-ref --format=%(refname) ", BranchsCreator.PREFIX);
     Executors.executeAll(branchListCommand, new BranchsCreator(gitRepo), ERROR_LOG, new File(gitRepo));
   }
 
@@ -75,7 +97,7 @@ public class Main {
 
   static void logStep(long start, String step) {
     System.out.append(Files.LINE_SEPARATOR);
-    System.out.append(Strings.append(step, String.valueOf((new Date().getTime() - start) / 1000), " s")).append(Files.LINE_SEPARATOR);
+    System.out.append(append(step, String.valueOf((new Date().getTime() - start) / 1000), " s")).append(Files.LINE_SEPARATOR);
     System.out.append(Files.LINE_SEPARATOR);
   }
 }

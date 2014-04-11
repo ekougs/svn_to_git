@@ -4,9 +4,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import static junit.framework.TestCase.assertEquals;
-import static junit.framework.TestCase.assertFalse;
-import static junit.framework.TestCase.assertTrue;
+import static junit.framework.TestCase.*;
 
 public class ArgumentsParserTest {
   @Rule
@@ -21,9 +19,9 @@ public class ArgumentsParserTest {
 
   @Test
   public void testOnlyMandatoryParameter() throws Exception {
-    ArgumentsParser.Options options = ArgumentsParser.getOptions(new String[]{"--repo", "nimportequoi", "--author-mail", "john@doe.com"});
+    ArgumentsParser.Options options = ArgumentsParser.getOptions(new String[]{"--repo", "nimportequoi"});
     assertEquals("nimportequoi", options.getSvnRepo());
-    assertEquals("john@doe.com", options.getMail());
+    assertEquals(Strings.EMPTY, options.getMail());
     assertEquals(Strings.EMPTY, options.getGitRepo());
     assertEquals(Files.getLocalFilePath(ArgumentsParserTest.class, "authors"), options.getAuthorsFilePath());
     assertFalse(options.isAuthorsFileProvided());
