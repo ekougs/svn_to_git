@@ -2,9 +2,9 @@ package com.bisam.svntogit;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Future;
 
 public class Executors {
   static Process executeCommand(String command) throws IOException {
@@ -58,40 +58,51 @@ public class Executors {
     return processResult;
   }
 
-  static ExecutorServiceShutter executeInParallel(Runnable... runnables)
-    throws ExecutionException, InterruptedException {
+  static ExecutorServiceShutter executeInParallel(Runnable... runnables) throws ExecutionException, InterruptedException {
     if (runnables == null || runnables.length == 0) {
       throw new IllegalArgumentException("Must submit at least one runnable");
     }
     int numberOfThreads = runnables.length;
     final ExecutorService executorService = java.util.concurrent.Executors.newFixedThreadPool(numberOfThreads);
-    Future<Boolean>[] futures = (Future<Boolean>[])new Future[numberOfThreads];
-    int index = 0;
+    CountDownLatch countDownLatch = new CountDownLatch(numberOfThreads);
     for (Runnable runnable : runnables) {
-      futures[index] = executorService.submit(runnable, true);
-      index++;
+      executorService.execute(new CountingDownRunnable(runnable, countDownLatch));
     }
-    return new ExecutorServiceShutter(executorService, futures);
+    return new ExecutorServiceShutter(executorService, countDownLatch);
   }
 
   public static class ExecutorServiceShutter {
     private final ExecutorService executorServiceToShut;
-    private final Future<Boolean>[] futures;
+    private final CountDownLatch countDownLatch;
 
-    private ExecutorServiceShutter(ExecutorService executorServiceToShut, Future<Boolean>[] futures) {
+    private ExecutorServiceShutter(ExecutorService executorServiceToShut, CountDownLatch countDownLatch) {
       this.executorServiceToShut = executorServiceToShut;
-      this.futures = futures;
+      this.countDownLatch = countDownLatch;
     }
 
     public ExecutorServiceShutter waitForTasks() throws ExecutionException, InterruptedException {
-      for (Future<Boolean> future : futures) {
-        future.get();
-      }
+      countDownLatch.await();
       return this;
     }
 
     public void shutdown() {
       executorServiceToShut.shutdown();
+    }
+  }
+
+  private static class CountingDownRunnable implements Runnable {
+    private final Runnable runnable;
+    private final CountDownLatch countDownLatch;
+
+    public CountingDownRunnable(Runnable runnable, CountDownLatch countDownLatch) {
+      this.runnable = runnable;
+      this.countDownLatch = countDownLatch;
+    }
+
+    @Override
+    public void run() {
+      runnable.run();
+      countDownLatch.countDown();
     }
   }
 }
