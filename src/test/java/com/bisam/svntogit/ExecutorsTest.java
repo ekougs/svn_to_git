@@ -44,14 +44,6 @@ public class ExecutorsTest {
         assertFalse(hasError());
     }
 
-    private boolean hasError() throws FileNotFoundException {
-        Iterator<String> errorFileLineIterator =
-                new BufferedReaderIterable(
-                        new BufferedReader(new FileReader(Files.getLocalFilePath(ExecutorsTest.class, ERROR))))
-                        .iterator();
-        return errorFileLineIterator.hasNext();
-    }
-
     @Test
     public void testExecuteAllNoErrorOnFile() throws Exception {
         LastInputRetriever lastInputRetriever = new LastInputRetriever();
@@ -70,6 +62,14 @@ public class ExecutorsTest {
                 InputStreamReaderRunnable.InputStreamLineHandler.NULL,
                 lastErrorRetriever);
         assertTrue(lastErrorRetriever.inputLine.toString().trim().isEmpty());
+    }
+
+    private boolean hasError() throws FileNotFoundException {
+        Iterator<String> errorFileLineIterator =
+                new BufferedReaderIterable(
+                        new BufferedReader(new FileReader(Files.getLocalFilePath(ExecutorsTest.class, ERROR))))
+                        .iterator();
+        return errorFileLineIterator.hasNext();
     }
 
     private String getEchoCommand() {
