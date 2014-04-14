@@ -14,8 +14,8 @@ OPTIONAL
                           
 --author-file-provided : State that the author file is provided and does not need to be generated.
 
---author-mail : Provide an unique author mail for all users. If not provided, you should call Main.launchGitRepoCreation with an email supplier (com.bisam.svntogit.MailSupplier).
+--author-mail : Provide an unique author mail for all users. If not provided, you should call Main.launchGitRepoCreation with an email supplier (com.bisam.svntogit.MailSupplier). A possible implementation of the email supplier is an LDAP connected one getting author name, retrieving LDAP information associated to this author and returning the proper e-mail.
 
-A possible implementation of the email supplier is an LDAP connected one getting author name, retrieving LDAP information associated to this author and returning the proper e-mail.
+Run "mvn clean package" to build the jar with dependencies which you can run.
 
 It MUST be run with Java 7+ JVM.
