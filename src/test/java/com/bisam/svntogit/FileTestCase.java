@@ -5,7 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.LinkedList;
 
-public class FileTestCase {
+public abstract class FileTestCase {
   static final LinkedList<String> EXPECTED_LOG_LINES = new LinkedList<>();
 
   static {

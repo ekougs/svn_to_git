@@ -81,6 +81,7 @@ public class Main {
              " ", gitRepo, " --trunk=trunk --tags=tags --branches=branches");
 
     Executors.executeAll(gitSvnCloneCommand, InputStreamToOutputs.init(System.out), ERROR_LOG);
+    Executors.executeAll("git svn fetch", InputStreamToOutputs.init(System.out), ERROR_LOG);
   }
 
   private static void createBranches(String gitRepo) throws IOException, ExecutionException, InterruptedException {
