@@ -3,12 +3,12 @@ package com.bisam.svntogit;
 import java.io.File;
 import java.io.IOException;
 
-class BranchsCreator implements InputStreamReaderRunnable.InputStreamLineHandler {
+class BranchesCreator implements InputStreamReaderRunnable.InputStreamLineHandler {
   public static final String PREFIX = "refs/remotes/svn/";
   private static final String TRUNK = "refs/remotes/svn/trunk";
   private final File gitRepo;
 
-  BranchsCreator(String gitRepo) {
+  BranchesCreator(String gitRepo) {
     this.gitRepo = new File(gitRepo);
   }
 

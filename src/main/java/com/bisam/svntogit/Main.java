@@ -33,27 +33,30 @@ public class Main {
 
   private static void launchGitRepoCreation(ArgumentsParser.Options options, MailSupplier mailSupplier)
     throws IOException, InterruptedException, ExecutionException {
-    long start;
+    long start = new Date().getTime();
+    long stepStart;
     if (!options.isAuthorsFileProvided()) {
-      start = new Date().getTime();
+      stepStart = new Date().getTime();
       boolean authorsFileReady = writeAuthorFile(options, mailSupplier);
       if (!authorsFileReady) {
         return;
       }
-      logStep(start, "Author file : ");
+      logStep(stepStart, "Author file : ");
     }
 
-    start = new Date().getTime();
+    stepStart = new Date().getTime();
     createGitRepo(options);
-    logStep(start, "Clone : ");
+    logStep(stepStart, "Clone : ");
 
-    start = new Date().getTime();
+    stepStart = new Date().getTime();
     createTags(options.getGitRepo());
-    logStep(start, "Tags : ");
+    logStep(stepStart, "Tags : ");
 
-    start = new Date().getTime();
+    stepStart = new Date().getTime();
     createBranches(options.getGitRepo());
-    logStep(start, "Branches : ");
+    logStep(stepStart, "Branches : ");
+
+    logStep(start, "Total : " );
   }
 
   static void createTags(String gitRepo) throws IOException, ExecutionException, InterruptedException {
@@ -81,12 +84,11 @@ public class Main {
              " ", gitRepo, " --trunk=trunk --tags=tags --branches=branches");
 
     Executors.executeAll(gitSvnCloneCommand, InputStreamToOutputs.init(System.out), ERROR_LOG);
-    Executors.executeAll("git svn fetch", InputStreamToOutputs.init(System.out), ERROR_LOG);
   }
 
   private static void createBranches(String gitRepo) throws IOException, ExecutionException, InterruptedException {
-    String branchListCommand = append("git for-each-ref --format=%(refname) ", BranchsCreator.PREFIX);
-    Executors.executeAll(branchListCommand, new BranchsCreator(gitRepo), ERROR_LOG, new File(gitRepo));
+    String branchListCommand = append("git for-each-ref --format=%(refname) ", BranchesCreator.PREFIX);
+    Executors.executeAll(branchListCommand, new BranchesCreator(gitRepo), ERROR_LOG, new File(gitRepo));
   }
 
   private static void deleteGitRepo(String gitRepo) throws IOException {
