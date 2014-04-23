@@ -15,17 +15,12 @@ class BranchesCreator implements InputStreamReaderRunnable.InputStreamLineHandle
   @Override
   public void handleLine(String originalBranch) {
     if (TRUNK.equals(originalBranch)) {
+      deleteSvnTrunkBranch(originalBranch);
       return;
     }
     String branch = originalBranch.substring(PREFIX.length());
     try {
-      String gitBranchCommand = Strings.append("git branch -t ", branch, " ", originalBranch);
-      System.out.append(gitBranchCommand).append(Files.LINE_SEPARATOR);
-      Executors.executeCommand(gitBranchCommand, gitRepo).waitFor();
-      String updateRefTagCommand = Strings.append("git update-ref -d ", originalBranch);
-      System.out.append(updateRefTagCommand).append(Files.LINE_SEPARATOR);
-      Executors.executeCommand(updateRefTagCommand, gitRepo).waitFor();
-      System.out.append(Files.LINE_SEPARATOR);
+      createBranch(branch);
     }
     catch (IOException | InterruptedException e) {
       throw new RuntimeException(e);
@@ -34,5 +29,23 @@ class BranchesCreator implements InputStreamReaderRunnable.InputStreamLineHandle
 
   @Override
   public void close() {
+  }
+
+  private void deleteSvnTrunkBranch(String originalBranch) {
+    String gitDeleteTrunkCommand = Strings.append("git branch -D ", originalBranch);
+    System.out.append(gitDeleteTrunkCommand).append(Files.LINE_SEPARATOR);
+    try {
+        Executors.executeCommand(gitDeleteTrunkCommand, gitRepo).waitFor();
+    }
+    catch (IOException | InterruptedException e) {
+        throw new RuntimeException(e);
+    }
+  }
+
+  private void createBranch(String branch) throws InterruptedException, IOException {
+    String gitBranchCommand = Strings.append("git checkout ", branch);
+    System.out.append(gitBranchCommand).append(Files.LINE_SEPARATOR);
+    Executors.executeCommand(gitBranchCommand, gitRepo).waitFor();
+    System.out.append(Files.LINE_SEPARATOR);
   }
 }
