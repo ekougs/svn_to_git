@@ -1,4 +1,4 @@
-package com.bisam.svntogit;
+package com.bisam.svntogit.clone;
 
 import org.junit.Test;
 

@@ -1,5 +1,6 @@
-package com.bisam.svntogit;
+package com.bisam.svntogit.utils;
 
+import com.bisam.svntogit.utils.Strings;
 import org.junit.Test;
 
 import static junit.framework.TestCase.assertEquals;

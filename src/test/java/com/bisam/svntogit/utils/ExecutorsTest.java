@@ -1,4 +1,4 @@
-package com.bisam.svntogit;
+package com.bisam.svntogit.utils;
 
 import org.junit.Rule;
 import org.junit.Test;

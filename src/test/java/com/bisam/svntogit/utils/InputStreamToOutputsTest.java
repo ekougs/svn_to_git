@@ -1,5 +1,6 @@
-package com.bisam.svntogit;
+package com.bisam.svntogit.utils;
 
+import com.bisam.svntogit.FileTestCase;
 import org.junit.Test;
 
 import java.io.File;

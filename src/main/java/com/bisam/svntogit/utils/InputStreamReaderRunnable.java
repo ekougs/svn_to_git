@@ -1,11 +1,11 @@
-package com.bisam.svntogit;
+package com.bisam.svntogit.utils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-class InputStreamReaderRunnable implements Runnable {
+public class InputStreamReaderRunnable implements Runnable {
   private int numberOfRetry = 0;
   private final InputStream inputStream;
   private final InputStreamLineHandler inputStreamLineHandler;

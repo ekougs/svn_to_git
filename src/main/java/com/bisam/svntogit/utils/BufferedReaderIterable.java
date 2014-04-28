@@ -1,13 +1,13 @@
-package com.bisam.svntogit;
+package com.bisam.svntogit.utils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.Iterator;
 
-class BufferedReaderIterable implements Iterable<String> {
+public class BufferedReaderIterable implements Iterable<String> {
   private final BufferedReader bufferedReader;
 
-  BufferedReaderIterable(BufferedReader bufferedReader) {
+  public BufferedReaderIterable(BufferedReader bufferedReader) {
     this.bufferedReader = bufferedReader;
   }
 

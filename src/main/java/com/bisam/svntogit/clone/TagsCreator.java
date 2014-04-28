@@ -1,14 +1,21 @@
-package com.bisam.svntogit;
+package com.bisam.svntogit.clone;
+
+import com.bisam.svntogit.utils.InputStreamReaderRunnable;
+import com.bisam.svntogit.utils.InputStreamResultProvider;
+import com.bisam.svntogit.utils.Executors;
+import com.bisam.svntogit.utils.InputStreamToOutputs;
+import com.bisam.svntogit.utils.Logs;
+import com.bisam.svntogit.utils.Strings;
 
 import java.io.File;
 import java.io.IOException;
 
-class TagsCreator implements InputStreamReaderRunnable.InputStreamLineHandler {
+public class TagsCreator implements InputStreamReaderRunnable.InputStreamLineHandler {
   public static final String PREFIX = "refs/remotes/svn/tags/";
   private static final String ERROR_LOG = "error_tags.log";
   private final File gitRepo;
 
-  TagsCreator(String gitRepo) {
+  public TagsCreator(String gitRepo) {
     this.gitRepo = new File(gitRepo);
   }
 
@@ -23,11 +30,22 @@ class TagsCreator implements InputStreamReaderRunnable.InputStreamLineHandler {
       Logs.appendln(tag, " ", committerName, " <", committerEmail, "> ", commitDate);
 
       String tagComment =
-        Strings.append("Tag: ", tag, " sha1: ", sha1, " using '", committerName, "' <", committerEmail, "> on ", commitDate);
+        Strings.append("Tag: ",
+                       tag,
+                       " sha1: ",
+                       sha1,
+                       " using '",
+                       committerName,
+                       "' <",
+                       committerEmail,
+                       "> on ",
+                       commitDate);
       Logs.appendln(tagComment);
       ProcessBuilder gitCreationCommandBuilder =
         new ProcessBuilder("git", "tag", "-a", tag, "-m", tagComment, sha1).directory(gitRepo);
-      Executors.processAll(gitCreationCommandBuilder.start(), NULL, InputStreamToOutputs.getErrorStreamHandler(ERROR_LOG));
+      Executors.processAll(gitCreationCommandBuilder.start(),
+                           NULL,
+                           InputStreamToOutputs.getErrorStreamHandler(ERROR_LOG));
 
       String updateRefTagCommand = Strings.append("git update-ref -d ", originalTagName);
       Logs.appendln(updateRefTagCommand);

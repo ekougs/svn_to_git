@@ -1,9 +1,11 @@
-package com.bisam.svntogit;
+package com.bisam.svntogit.utils;
+
+import com.bisam.svntogit.Main;
 
 import java.io.*;
 import java.util.ArrayList;
 
-class InputStreamToOutputs implements InputStreamReaderRunnable.InputStreamLineHandler, AutoCloseable {
+public class InputStreamToOutputs implements InputStreamReaderRunnable.InputStreamLineHandler, AutoCloseable {
   private final ArrayList<PrintStream> outputStreams = new ArrayList<>();
   private int numberOfOperations = 0;
   private PrintWriter inputLogWriter;
@@ -16,7 +18,7 @@ class InputStreamToOutputs implements InputStreamReaderRunnable.InputStreamLineH
     return new InputStreamToOutputs();
   }
 
-  static InputStreamToOutputs getErrorStreamHandler(String errorLogFileName) throws IOException {
+  public static InputStreamToOutputs getErrorStreamHandler(String errorLogFileName) throws IOException {
     return init(new File(Files.getLocalFilePath(Main.class, errorLogFileName)));
   }
 

@@ -1,13 +1,15 @@
-package com.bisam.svntogit;
+package com.bisam.svntogit.branchrepair;
+
+import com.bisam.svntogit.utils.*;
 
 import java.io.File;
 import java.io.IOException;
 
-class BranchesRepairer {
+public class BranchesRepairer {
     static final String BRANCHES_REPAIRER_ERROR = "branch_repair_error.log";
     private static final String TEMP = "_TEMP";
 
-    static void repair(File gitRepository) throws IOException, InterruptedException {
+    public static void repair(File gitRepository) throws IOException, InterruptedException {
         Logs.appendln(Gits.GIT_BRANCH_LIST_COMMAND);
         Executors.executeAll(Gits.GIT_BRANCH_LIST_COMMAND, new BranchRepairer(gitRepository),
                              BRANCHES_REPAIRER_ERROR, gitRepository);

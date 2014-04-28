@@ -1,7 +1,0 @@
-r25570 = 58b209ca3ac1c2eac362ae06a39d5d04094db236 (refs/remotes/svn/branch)
-	M	com/foo/ActAFool.java
-r25571 = fcc72d64466404d0258b0ab1fbd500424910f5c0 (refs/remotes/svn/trunk)
-	A	com/foo/Dummy.java
-r25572 = fe06204feb4cdc1c40331ef63f1e3331c5fab2e1 (refs/remotes/svn/trunk)
-	M	com/foo/ActAFool.java
-	M	com/foo/Dummy.java

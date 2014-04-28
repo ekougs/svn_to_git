@@ -1,5 +1,7 @@
 package com.bisam.svntogit;
 
+import com.bisam.svntogit.utils.Files;
+import com.bisam.svntogit.utils.Strings;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;

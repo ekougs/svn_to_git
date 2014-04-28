@@ -1,4 +1,4 @@
-package com.bisam.svntogit;
+package com.bisam.svntogit.clone;
 
 public class SingleMailSupplier implements MailSupplier {
   private final String uniqueMail;

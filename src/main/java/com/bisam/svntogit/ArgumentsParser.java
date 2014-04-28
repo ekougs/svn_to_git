@@ -1,5 +1,8 @@
 package com.bisam.svntogit;
 
+import com.bisam.svntogit.utils.Files;
+import com.bisam.svntogit.utils.Strings;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
@@ -7,7 +10,7 @@ import java.util.Map;
 
 public class ArgumentsParser {
 
-  static Options getOptions(String[] args) {
+  public static Options getOptions(String[] args) {
     Options options = new Options();
     Parameter parameter;
     for (int i = 0; i < args.length; i += parameter.step) {
@@ -22,7 +25,7 @@ public class ArgumentsParser {
     return options;
   }
 
-  static class Options {
+  public static class Options {
     private final Map<String, String> optionValues = new HashMap<>();
 
     private Options() {

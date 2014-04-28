@@ -1,13 +1,18 @@
 package com.bisam.svntogit;
 
+import com.bisam.svntogit.branchrepair.BranchesRepairer;
+import com.bisam.svntogit.clone.*;
+import com.bisam.svntogit.utils.Executors;
+import com.bisam.svntogit.utils.InputStreamToOutputs;
+import com.bisam.svntogit.utils.Logs;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Date;
 
-import static com.bisam.svntogit.Strings.append;
-import static com.bisam.svntogit.Strings.isEmptyString;
+import static com.bisam.svntogit.utils.Strings.append;
+import static com.bisam.svntogit.utils.Strings.isEmptyString;
 
 public class Main {
   private static final String ERROR_LOG = "error_main.log";
@@ -26,7 +31,7 @@ public class Main {
     launchGitRepoCreation(options, new SingleMailSupplier(options.getMail()));
   }
 
-  public static void launchGitRepoCreation(String[] args, MailSupplier mailSupplier) 
+  public static void launchGitRepoCreation(String[] args, MailSupplier mailSupplier)
           throws IOException, InterruptedException {
     ArgumentsParser.Options options = ArgumentsParser.getOptions(args);
     launchGitRepoCreation(options, mailSupplier);

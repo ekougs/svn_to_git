@@ -1,9 +1,9 @@
-package com.bisam.svntogit;
+package com.bisam.svntogit.utils;
 
 /**
 * Created by rd on 23/04/14.
 */
-class InputStreamResultProvider implements InputStreamReaderRunnable.InputStreamLineHandler {
+public class InputStreamResultProvider implements InputStreamReaderRunnable.InputStreamLineHandler {
   private String result;
 
   @Override
@@ -15,7 +15,7 @@ class InputStreamResultProvider implements InputStreamReaderRunnable.InputStream
   public void close() {
   }
 
-  String getResult() {
+  public String getResult() {
       return result;
   }
 }

@@ -1,16 +1,16 @@
-package com.bisam.svntogit;
+package com.bisam.svntogit.utils;
 
 import java.io.File;
 
-class Files {
+public class Files {
   static final String LINE_SEPARATOR = System.getProperty("line.separator");
 
-  static String getLocalFilePath(Class<?> baseClass, String fileName) {
+  public static String getLocalFilePath(Class<?> baseClass, String fileName) {
     String localDirectory = getLocalDirectory(baseClass);
     return localDirectory + File.separatorChar + fileName;
   }
 
-  static String getLocalDirectory(Class<?> baseClass) {
+  public static String getLocalDirectory(Class<?> baseClass) {
     return new File(baseClass.getProtectionDomain().getCodeSource().getLocation().getPath()).getParent();
   }
 

@@ -1,4 +1,10 @@
-package com.bisam.svntogit;
+package com.bisam.svntogit.branchrepair;
+
+import com.bisam.svntogit.utils.InputStreamReaderRunnable;
+import com.bisam.svntogit.utils.Executors;
+import com.bisam.svntogit.utils.Gits;
+import com.bisam.svntogit.utils.Logs;
+import com.bisam.svntogit.utils.Strings;
 
 import java.io.File;
 import java.io.IOException;

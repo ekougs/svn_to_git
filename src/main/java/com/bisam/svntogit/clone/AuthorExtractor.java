@@ -1,4 +1,4 @@
-package com.bisam.svntogit;
+package com.bisam.svntogit.clone;
 
 import java.io.BufferedReader;
 import java.io.File;

@@ -1,12 +1,15 @@
 package com.bisam.svntogit;
 
+import com.bisam.svntogit.utils.BufferedReaderIterable;
+import com.bisam.svntogit.utils.Strings;
+
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.LinkedList;
 
-abstract class FileTestCase {
-  static final LinkedList<String> EXPECTED_LOG_LINES = new LinkedList<>();
+public abstract class FileTestCase {
+  public static final LinkedList<String> EXPECTED_LOG_LINES = new LinkedList<>();
 
   static {
     FileTestCase.EXPECTED_LOG_LINES.add("Branch 0 creation");
