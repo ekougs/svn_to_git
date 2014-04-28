@@ -12,8 +12,8 @@ class InputStreamToOutputs implements InputStreamReaderRunnable.InputStreamLineH
     return new InputStreamToOutputs(fileForWriting);
   }
 
-  public static InputStreamToOutputs init(PrintStream outputStream) {
-    return new InputStreamToOutputs(outputStream);
+  public static InputStreamToOutputs initConsole() {
+    return new InputStreamToOutputs();
   }
 
   static InputStreamToOutputs getErrorStreamHandler(String errorLogFileName) throws IOException {
@@ -29,8 +29,8 @@ class InputStreamToOutputs implements InputStreamReaderRunnable.InputStreamLineH
     inputLogWriter = getPrintWriter(fileForWriting);
   }
 
-  private InputStreamToOutputs(PrintStream outputStream) {
-    this.outputStreams.add(outputStream);
+  private InputStreamToOutputs() {
+    this.outputStreams.add(System.out);
   }
 
   private PrintWriter getPrintWriter(File fileForWriting) throws IOException {

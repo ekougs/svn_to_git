@@ -42,7 +42,7 @@ class InputStreamReaderRunnable implements Runnable {
     }
   }
 
-  private boolean canBeRead(InputStream inputStream) throws IOException, InterruptedException {
+  private boolean canBeRead(InputStream inputStream) throws InterruptedException {
     try {
       Thread.sleep(50);
       return inputStream.available() != 0 || ++numberOfRetry <= 3;

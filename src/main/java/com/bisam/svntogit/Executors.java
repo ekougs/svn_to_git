@@ -3,7 +3,6 @@ package com.bisam.svntogit;
 import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 
 public class Executors {
@@ -17,25 +16,25 @@ public class Executors {
   }
 
   static int executeAll(String command, InputStreamReaderRunnable.InputStreamLineHandler inputStreamHandler, String errorLogFileName)
-    throws ExecutionException, InterruptedException, IOException {
+    throws InterruptedException, IOException {
     return executeAll(command, inputStreamHandler, InputStreamToOutputs.getErrorStreamHandler(errorLogFileName));
   }
 
   static int executeAll(String command, InputStreamReaderRunnable.InputStreamLineHandler inputStreamHandler, String errorLogFileName, File file)
-    throws ExecutionException, InterruptedException, IOException {
+    throws InterruptedException, IOException {
     return executeAll(command, inputStreamHandler, InputStreamToOutputs.getErrorStreamHandler(errorLogFileName), file);
   }
 
   private static int executeAll(String command, InputStreamReaderRunnable.InputStreamLineHandler inputStreamHandler,
                                 InputStreamReaderRunnable.InputStreamLineHandler errorStreamHandler, File file)
-    throws ExecutionException, InterruptedException, IOException {
+    throws InterruptedException, IOException {
     Process process = executeCommand(command, file);
     return processAll(process, inputStreamHandler, errorStreamHandler);
   }
 
   static int processAll(Process process, InputStreamReaderRunnable.InputStreamLineHandler inputStreamHandler,
                         InputStreamReaderRunnable.InputStreamLineHandler errorStreamHandler)
-    throws ExecutionException, InterruptedException, IOException {
+    throws InterruptedException {
     ExecutorServiceShutter executorServiceShutter =
       executeInParallel(InputStreamReaderRunnable.init(process.getInputStream(), inputStreamHandler),
                         InputStreamReaderRunnable.init(process.getErrorStream(), errorStreamHandler));
@@ -47,7 +46,7 @@ public class Executors {
 
   private static int executeAll(String command, InputStreamReaderRunnable.InputStreamLineHandler inputStreamHandler,
                                 InputStreamReaderRunnable.InputStreamLineHandler errorStreamHandler)
-    throws ExecutionException, InterruptedException, IOException {
+    throws InterruptedException, IOException {
     Process process = executeCommand(command);
     ExecutorServiceShutter executorServiceShutter =
       executeInParallel(InputStreamReaderRunnable.init(process.getInputStream(), inputStreamHandler),
@@ -58,7 +57,7 @@ public class Executors {
     return processResult;
   }
 
-  static ExecutorServiceShutter executeInParallel(Runnable... runnables) throws ExecutionException, InterruptedException {
+  static ExecutorServiceShutter executeInParallel(Runnable... runnables) {
     if (runnables == null || runnables.length == 0) {
       throw new IllegalArgumentException("Must submit at least one runnable");
     }
@@ -80,7 +79,7 @@ public class Executors {
       this.countDownLatch = countDownLatch;
     }
 
-    public ExecutorServiceShutter waitForTasks() throws ExecutionException, InterruptedException {
+    public ExecutorServiceShutter waitForTasks() throws InterruptedException {
       countDownLatch.await();
       return this;
     }

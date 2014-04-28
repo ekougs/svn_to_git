@@ -5,7 +5,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-public class AuthorFileWriter {
+class AuthorFileWriter {
   private final String authorFilePath;
   private final MailSupplier mailSupplier;
 

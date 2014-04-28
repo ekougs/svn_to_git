@@ -58,10 +58,10 @@ public class ExecutorsTest {
     public void testExecuteAllError() throws Exception {
         LastInputRetriever lastErrorRetriever = new LastInputRetriever();
         Executors.processAll(
-                Executors.executeCommand(getEchoCommand()),
+                Executors.executeCommand(getCommand("nimporte quoi")),
                 InputStreamReaderRunnable.InputStreamLineHandler.NULL,
                 lastErrorRetriever);
-        assertTrue(lastErrorRetriever.inputLine.toString().trim().isEmpty());
+        assertFalse(lastErrorRetriever.inputLine.toString().trim().isEmpty());
     }
 
     private boolean hasError() throws FileNotFoundException {
@@ -102,7 +102,7 @@ public class ExecutorsTest {
     }
 
     private static class LastInputRetriever implements InputStreamReaderRunnable.InputStreamLineHandler {
-        private StringBuilder inputLine = new StringBuilder();
+        private final StringBuilder inputLine = new StringBuilder();
 
         @Override
         public void handleLine(String inputStreamLine) {

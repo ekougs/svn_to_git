@@ -7,7 +7,7 @@ import java.util.Map;
 
 public class ArgumentsParser {
 
-  static Options getOptions(String[] args) throws IOException {
+  static Options getOptions(String[] args) {
     Options options = new Options();
     Parameter parameter;
     for (int i = 0; i < args.length; i += parameter.step) {
@@ -38,17 +38,19 @@ public class ArgumentsParser {
     }
 
     String getGitRepo() {
-      String gitRepoOptionName = Parameter.GIT_REPO_OPTION.name;
-      return getOptionalField(gitRepoOptionName);
+        return getOptionalField(Parameter.GIT_REPO_OPTION.name);
     }
 
     boolean isAuthorsFileProvided() {
-      return optionValues.containsKey(Parameter.AUTHOR_FILE_PROVIDED.name);
+      return contains(Parameter.AUTHOR_FILE_PROVIDED);
+    }
+
+    boolean repairBranches() {
+      return contains(Parameter.REPAIR_BRANCHES);
     }
 
     String getMail() {
-      String authorMailParameterName = Parameter.AUTHOR_MAIL.name;
-      return getOptionalField(authorMailParameterName);
+        return getOptionalField(Parameter.AUTHOR_MAIL.name);
     }
 
     void set(Parameter parameter, String value) {
@@ -62,10 +64,6 @@ public class ArgumentsParser {
           throw new IllegalArgumentException(parameterName + " is mandatory.");
         }
       }
-    }
-
-    private String getOptionalField(String authorMailParameterName) {
-      return isEmptyValue(authorMailParameterName) ? Strings.EMPTY : optionValues.get(authorMailParameterName);
     }
 
     private boolean isEmptyValue(String parameterName) {
@@ -84,6 +82,14 @@ public class ArgumentsParser {
       }
       return file.getAbsolutePath();
     }
+
+    private String getOptionalField(String parameterName) {
+        return isEmptyValue(parameterName) ? Strings.EMPTY : optionValues.get(parameterName);
+    }
+
+    private boolean contains(Parameter parameter) {
+        return optionValues.containsKey(parameter.name);
+    }
   }
 
   static enum Parameter {
@@ -91,7 +97,8 @@ public class ArgumentsParser {
     SVN_REPO_OPTION("--repo", true),
     GIT_REPO_OPTION("--git-repo"),
     AUTHOR_FILE_PROVIDED("--author-file-provided", Boolean.TRUE.toString()),
-    AUTHOR_MAIL("--author-mail");
+    AUTHOR_MAIL("--author-mail"),
+    REPAIR_BRANCHES("--repair-branches", Boolean.TRUE.toString());
 
     private final String name;
     private final int step;

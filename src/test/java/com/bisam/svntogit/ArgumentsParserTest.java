@@ -39,11 +39,12 @@ public class ArgumentsParserTest {
     ArgumentsParser.Options options =
       ArgumentsParser.getOptions(new String[]{"--author-file-provided", "--author-mail", "john@doe.com", "--repo", "repoquoi",
                                               "--file", "authorfilequoi",
-                                              "--git-repo", "gitquoi"});
+                                              "--git-repo", "gitquoi", "--repair-branches"});
     assertEquals("repoquoi", options.getSvnRepo());
     assertEquals("gitquoi", options.getGitRepo());
     assertEquals("john@doe.com", options.getMail());
     assertEquals("authorfilequoi", options.getAuthorsFilePath());
     assertTrue(options.isAuthorsFileProvided());
+    assertTrue(options.repairBranches());
   }
 }

@@ -1,9 +1,9 @@
 package com.bisam.svntogit;
 
-public class Strings {
-  public static final String EMPTY = "";
+class Strings {
+  static final String EMPTY = "";
 
-  static String append(String... stringsToAppend) {
+    static String append(String... stringsToAppend) {
         if (stringsToAppend == null) {
             return Strings.EMPTY;
         }

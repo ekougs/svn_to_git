@@ -9,8 +9,7 @@ import java.nio.file.Paths;
 import static junit.framework.Assert.assertEquals;
 
 public class FilesTest {
-
-  public static final String TEMP_TXT = "temp.txt";
+  private static final String TEMP_TXT = "temp.txt";
 
   @Test
   public void testLocalDirectory() throws Exception {

@@ -8,15 +8,15 @@ import java.util.HashSet;
 import java.util.Iterator;
 
 public class AuthorExtractor {
-  public static final String LOG_INFO_SEPARATOR = " | ";
-  public static final String LOG_INFO_SEPARATOR_REGEX = " \\| ";
+  private static final String LOG_INFO_SEPARATOR = " | ";
+  private static final String LOG_INFO_SEPARATOR_REGEX = " \\| ";
   private final String logFileLocation;
 
   private AuthorExtractor(String logFileLocation) {
     this.logFileLocation = logFileLocation;
   }
 
-  public static AuthorExtractor init(String logFileLocation) throws IOException {
+  public static AuthorExtractor init(String logFileLocation) {
     File logFile = new File(logFileLocation);
     if (!logFile.isFile()) {
       throw new IllegalArgumentException("Log file location must point to a file.");
