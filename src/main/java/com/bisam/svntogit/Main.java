@@ -2,9 +2,7 @@ package com.bisam.svntogit;
 
 import com.bisam.svntogit.branchrepair.BranchesRepairer;
 import com.bisam.svntogit.clone.*;
-import com.bisam.svntogit.utils.Executors;
-import com.bisam.svntogit.utils.InputStreamToOutputs;
-import com.bisam.svntogit.utils.Logs;
+import com.bisam.svntogit.utils.*;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
@@ -60,7 +58,7 @@ public class Main {
     logStep(stepStart, "Tags : ");
 
     stepStart = new Date().getTime();
-    createBranches(gitRepo);
+    createBranches(gitRepo, options.getAllowedBranchesPath());
     logStep(stepStart, "Branches : ");
 
     if(options.repairBranches()) {
@@ -100,9 +98,11 @@ public class Main {
                          ERROR_LOG);
   }
 
-  private static void createBranches(String gitRepo) throws IOException, InterruptedException {
+  private static void createBranches(String gitRepo, String allowedBranchesPath) throws IOException, InterruptedException {
     String branchListCommand = append("git for-each-ref --format=%(refname) ", BranchesCreator.PREFIX);
-    Executors.executeAll(branchListCommand, new BranchesCreator(gitRepo), ERROR_LOG, new File(gitRepo));
+    File gitRepoFile = new File(gitRepo);
+    Executors.executeAll(branchListCommand, new BranchesCreator(gitRepo), ERROR_LOG, gitRepoFile);
+    NonAllowedBranchEraser.init(gitRepo, allowedBranchesPath).remove();
   }
 
   private static void deleteGitRepo(String gitRepo) throws IOException {

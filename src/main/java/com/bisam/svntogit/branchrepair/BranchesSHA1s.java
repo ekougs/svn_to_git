@@ -114,7 +114,7 @@ class BranchesSHA1s {
         }
     }
 
-    private static class BranchSHA1sLoader implements InputStreamReaderRunnable.InputStreamLineHandler {
+    private static class BranchSHA1sLoader implements Gits.BranchConsumer {
         private final HashMap<String, SHA1s> branchesRevisions = new HashMap<>();
         private final File gitRepository;
 
@@ -123,8 +123,7 @@ class BranchesSHA1s {
         }
 
         @Override
-        public void handleLine(String line) {
-            String branchName = BranchesRepairer.getBranchName(line);
+        public void consume(String branchName) {
             try {
                 SHA1sLoader sha1sLoader = new SHA1sLoader();
                 String branchRevListCommand = Strings.append(Gits.GIT_LOG_SHA1_COMMIT_DATE_BRANCH_COMMAND, branchName);
@@ -138,10 +137,7 @@ class BranchesSHA1s {
             } catch (InterruptedException | IOException e) {
                 throw new RuntimeException(e);
             }
-        }
 
-        @Override
-        public void close() {
         }
     }
 

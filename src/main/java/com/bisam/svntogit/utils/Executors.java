@@ -10,9 +10,9 @@ public class Executors {
     return executeCommand(command, new File(Files.getLocalDirectory(Executors.class)));
   }
 
-  public static Process executeCommand(String command, File file) throws IOException {
+  public static Process executeCommand(String command, File directory) throws IOException {
     Runtime rt = Runtime.getRuntime();
-    return rt.exec(command, new String[0], file);
+    return rt.exec(command, new String[0], directory);
   }
 
   public static int executeAll(String command, InputStreamReaderRunnable.InputStreamLineHandler inputStreamHandler, String errorLogFileName)
@@ -20,15 +20,15 @@ public class Executors {
     return executeAll(command, inputStreamHandler, InputStreamToOutputs.getErrorStreamHandler(errorLogFileName));
   }
 
-  public static int executeAll(String command, InputStreamReaderRunnable.InputStreamLineHandler inputStreamHandler, String errorLogFileName, File file)
+  public static int executeAll(String command, InputStreamReaderRunnable.InputStreamLineHandler inputStreamHandler, String errorLogFileName, File directory)
     throws InterruptedException, IOException {
-    return executeAll(command, inputStreamHandler, InputStreamToOutputs.getErrorStreamHandler(errorLogFileName), file);
+    return executeAll(command, inputStreamHandler, InputStreamToOutputs.getErrorStreamHandler(errorLogFileName), directory);
   }
 
   private static int executeAll(String command, InputStreamReaderRunnable.InputStreamLineHandler inputStreamHandler,
-                                InputStreamReaderRunnable.InputStreamLineHandler errorStreamHandler, File file)
+                                InputStreamReaderRunnable.InputStreamLineHandler errorStreamHandler, File directory)
     throws InterruptedException, IOException {
-    Process process = executeCommand(command, file);
+    Process process = executeCommand(command, directory);
     return processAll(process, inputStreamHandler, errorStreamHandler);
   }
 
@@ -70,7 +70,12 @@ public class Executors {
     return new ExecutorServiceShutter(executorService, countDownLatch);
   }
 
-  public static class ExecutorServiceShutter {
+    public static void executeCommandAndWait(String command, File directory) throws IOException, InterruptedException {
+      Process process = executeCommand(command, directory);
+      processAll(process, InputStreamReaderRunnable.InputStreamLineHandler.NULL, InputStreamReaderRunnable.InputStreamLineHandler.NULL);
+  }
+
+    public static class ExecutorServiceShutter {
     private final ExecutorService executorServiceToShut;
     private final CountDownLatch countDownLatch;
 

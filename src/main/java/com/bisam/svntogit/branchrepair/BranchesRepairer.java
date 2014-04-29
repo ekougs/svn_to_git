@@ -15,10 +15,6 @@ public class BranchesRepairer {
                              BRANCHES_REPAIRER_ERROR, gitRepository);
     }
 
-    static String getBranchName(String line) {
-        return line.replaceAll("\\*", Strings.EMPTY).trim();
-    }
-
     private static class BranchRepairer implements InputStreamReaderRunnable.InputStreamLineHandler {
         private final File gitRepository;
         private BranchesSHA1s branchesSHA1s;
@@ -29,7 +25,7 @@ public class BranchesRepairer {
 
         @Override
         public void handleLine(String line) {
-            String branchName = getBranchName(line);
+            String branchName = Gits.getBranchName(line);
             if (Gits.MASTER.equals(branchName) || Gits.NO_BRANCH.equals(branchName)) {
                 return;
             }
@@ -54,7 +50,7 @@ public class BranchesRepairer {
                 String tempBranchCreationFromSHA1Command =
                         Strings.append(Gits.GIT_CHECKOUT_WITH_SHA1, tempBranch, " ", previousSHA1);
                 Logs.appendln(tempBranchCreationFromSHA1Command);
-                executeCommandAndWait(tempBranchCreationFromSHA1Command);
+                Executors.executeCommandAndWait(tempBranchCreationFromSHA1Command, gitRepository);
 
                 String linkBranchToTrunkCommand =
                         Strings.append(Gits.GIT_REBASE, tempBranch, " ", branchName);
@@ -65,7 +61,7 @@ public class BranchesRepairer {
                 String tempBranchDeletionCommand =
                         Strings.append(Gits.GIT_BRANCH_DELETION, tempBranch);
                 Logs.appendln(tempBranchDeletionCommand);
-                executeCommandAndWait(tempBranchDeletionCommand);
+                Executors.executeCommandAndWait(tempBranchDeletionCommand, gitRepository);
             } catch (InterruptedException | IOException e) {
                 throw new RuntimeException(e);
             }
@@ -96,11 +92,6 @@ public class BranchesRepairer {
                 branchesSHA1s = BranchesSHA1s.get(gitRepository);
             }
             return branchesSHA1s;
-        }
-
-        private void executeCommandAndWait(String command) throws IOException, InterruptedException {
-            Process process = Executors.executeCommand(command, gitRepository);
-            Executors.processAll(process, NULL, NULL);
         }
     }
 }

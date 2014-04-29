@@ -16,10 +16,36 @@ public class Gits {
     public static final String GIT_BRANCH_DELETION = "git branch -D ";
 
     public static void iterateOnBranches(File gitRepository,
-                                  InputStreamReaderRunnable.InputStreamLineHandler inputStreamHandler,
+                                  BranchConsumer branchConsumer,
                                   String errorFilePath)
             throws InterruptedException, IOException {
-        Executors.executeAll(GIT_BRANCH_LIST_COMMAND, inputStreamHandler,
+        Executors.executeAll(GIT_BRANCH_LIST_COMMAND, new BranchConsumerInputStreamLineHandler(branchConsumer),
                              errorFilePath, gitRepository);
+    }
+
+    public static String getBranchName(String line) {
+        return line.replaceAll("\\*", Strings.EMPTY).trim();
+    }
+
+    public static interface BranchConsumer {
+        void consume(String branchName);
+    }
+
+    private static class BranchConsumerInputStreamLineHandler implements InputStreamReaderRunnable.InputStreamLineHandler {
+        private final BranchConsumer branchConsumer;
+
+        private BranchConsumerInputStreamLineHandler(BranchConsumer branchConsumer) {
+            this.branchConsumer = branchConsumer;
+        }
+
+        @Override
+        public void handleLine(String branchLine) {
+            branchConsumer.consume(getBranchName(branchLine));
+        }
+
+        @Override
+        public void close() {
+
+        }
     }
 }

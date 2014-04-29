@@ -43,6 +43,9 @@ public class ArgumentsParser {
     String getGitRepo() {
         return getOptionalField(Parameter.GIT_REPO_OPTION.name);
     }
+    String getAllowedBranchesPath() {
+        return getOptionalField(Parameter.ALLOWED_BRANCHES.name);
+    }
 
     boolean isAuthorsFileProvided() {
       return contains(Parameter.AUTHOR_FILE_PROVIDED);
@@ -101,7 +104,8 @@ public class ArgumentsParser {
     GIT_REPO_OPTION("--git-repo"),
     AUTHOR_FILE_PROVIDED("--author-file-provided", Boolean.TRUE.toString()),
     AUTHOR_MAIL("--author-mail"),
-    REPAIR_BRANCHES("--repair-branches", Boolean.TRUE.toString());
+    REPAIR_BRANCHES("--repair-branches", Boolean.TRUE.toString()),
+    ALLOWED_BRANCHES("--allowed-branches");
 
     private final String name;
     private final int step;
