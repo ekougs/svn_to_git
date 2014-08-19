@@ -16,7 +16,7 @@ public class ArgumentsParserTest {
   public void testMandatoryNotSet() throws Exception {
     expectedException.expect(IllegalArgumentException.class);
     expectedException.expectMessage("--repo is mandatory.");
-    ArgumentsParser.getOptions(new String[0]);
+    ArgumentsParser.getOptions(new String[0], ArgumentsParser.Parameter.SVN_REPO_OPTION);
   }
 
   @Test

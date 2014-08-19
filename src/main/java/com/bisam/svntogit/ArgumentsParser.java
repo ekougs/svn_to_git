@@ -5,13 +5,15 @@ import com.bisam.svntogit.utils.Strings;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class ArgumentsParser {
 
-  public static Options getOptions(String[] args) {
-    Options options = new Options();
+  public static Options getOptions(String[] args, Parameter... mandatoryParameters) {
+    Options options = new Options(mandatoryParameters);
     Parameter parameter;
     for (int i = 0; i < args.length; i += parameter.step) {
       String option = args[i];
@@ -27,8 +29,10 @@ public class ArgumentsParser {
 
   public static class Options {
     private final Map<String, String> optionValues = new HashMap<>();
+    private List<Parameter> mandatoryParameters;
 
-    private Options() {
+    private Options(Parameter[] mandatoryParameters) {
+      this.mandatoryParameters = Arrays.asList(mandatoryParameters);
     }
 
     String getSvnRepo() {
@@ -67,7 +71,7 @@ public class ArgumentsParser {
     void check() {
       for (Parameter parameter : Parameter.values()) {
         String parameterName = parameter.name;
-        if (parameter.mandatory && isEmptyValue(parameterName)) {
+        if (mandatoryParameters.contains(parameter) && isEmptyValue(parameterName)) {
           throw new IllegalArgumentException(parameterName + " is mandatory.");
         }
       }
@@ -101,7 +105,7 @@ public class ArgumentsParser {
 
   static enum Parameter {
     FILE_OPTION("--file"),
-    SVN_REPO_OPTION("--repo", true),
+    SVN_REPO_OPTION("--repo"),
     GIT_REPO_OPTION("--git-repo"),
     AUTHOR_FILE_PROVIDED("--author-file-provided", Boolean.TRUE.toString()),
     AUTHOR_MAIL("--author-mail"),
@@ -111,25 +115,19 @@ public class ArgumentsParser {
     private final String name;
     private final int step;
     private final String value;
-    private final boolean mandatory;
 
     private Parameter(String name) {
-      this(name, 2, Strings.EMPTY, false);
-    }
-
-    private Parameter(String name, boolean mandatory) {
-      this(name, 2, Strings.EMPTY, mandatory);
+      this(name, 2, Strings.EMPTY);
     }
 
     private Parameter(String name, String value) {
-      this(name, 1, value, false);
+      this(name, 1, value);
     }
 
-    private Parameter(String name, int step, String value, boolean mandatory) {
+    private Parameter(String name, int step, String value) {
       this.name = name;
       this.step = step;
       this.value = value;
-      this.mandatory = mandatory;
     }
 
     public String getName() {

@@ -21,7 +21,7 @@ public class Main {
   }
 
   private static void launchGitRepoCreation(String[] args) throws IOException, InterruptedException {
-    ArgumentsParser.Options options = ArgumentsParser.getOptions(args);
+    ArgumentsParser.Options options = ArgumentsParser.getOptions(args, ArgumentsParser.Parameter.SVN_REPO_OPTION);
     if (isEmptyString(options.getMail())) {
       throw new IllegalArgumentException(
         append("E-mail must be supplied via ", ArgumentsParser.Parameter.AUTHOR_MAIL.getName(), " option if you don't provide a mail supplier."));
