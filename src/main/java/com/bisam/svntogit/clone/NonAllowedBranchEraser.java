@@ -73,10 +73,14 @@ public class NonAllowedBranchEraser {
 
     @Override
     public void consume(String branchName) {
-      if (!allowedBranches.contains(branchName)) {
+      if (canBeDeleted(branchName)) {
         Logs.appendln("Branch '", branchName, "' will be deleted");
         branchesToDelete.add(branchName);
       }
+    }
+
+    private boolean canBeDeleted(String branchName) {
+      return !Gits.MASTER.equals(branchName) && !allowedBranches.contains(branchName);
     }
   }
 }
