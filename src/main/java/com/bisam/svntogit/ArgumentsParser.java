@@ -41,10 +41,11 @@ public class ArgumentsParser {
     }
 
     String getGitRepo() {
-        return getOptionalField(Parameter.GIT_REPO_OPTION.name);
+      return getOptionalField(Parameter.GIT_REPO_OPTION.name);
     }
+
     String getAllowedBranchesPath() {
-        return getOptionalField(Parameter.ALLOWED_BRANCHES.name);
+      return getOptionalField(Parameter.ALLOWED_BRANCHES.name);
     }
 
     boolean isAuthorsFileProvided() {
@@ -56,7 +57,7 @@ public class ArgumentsParser {
     }
 
     String getMail() {
-        return getOptionalField(Parameter.AUTHOR_MAIL.name);
+      return getOptionalField(Parameter.AUTHOR_MAIL.name);
     }
 
     void set(Parameter parameter, String value) {
@@ -90,11 +91,11 @@ public class ArgumentsParser {
     }
 
     private String getOptionalField(String parameterName) {
-        return isEmptyValue(parameterName) ? Strings.EMPTY : optionValues.get(parameterName);
+      return isEmptyValue(parameterName) ? Strings.EMPTY : optionValues.get(parameterName);
     }
 
     private boolean contains(Parameter parameter) {
-        return optionValues.containsKey(parameter.name);
+      return optionValues.containsKey(parameter.name);
     }
   }
 

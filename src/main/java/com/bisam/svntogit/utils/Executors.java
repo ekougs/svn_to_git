@@ -20,7 +20,8 @@ public class Executors {
     return executeAll(command, inputStreamHandler, InputStreamToOutputs.getErrorStreamHandler(errorLogFileName));
   }
 
-  public static int executeAll(String command, InputStreamReaderRunnable.InputStreamLineHandler inputStreamHandler, String errorLogFileName, File directory)
+  public static int executeAll(String command, InputStreamReaderRunnable.InputStreamLineHandler inputStreamHandler, String errorLogFileName,
+                               File directory)
     throws InterruptedException, IOException {
     return executeAll(command, inputStreamHandler, InputStreamToOutputs.getErrorStreamHandler(errorLogFileName), directory);
   }
@@ -33,7 +34,7 @@ public class Executors {
   }
 
   public static int processAll(Process process, InputStreamReaderRunnable.InputStreamLineHandler inputStreamHandler,
-                        InputStreamReaderRunnable.InputStreamLineHandler errorStreamHandler)
+                               InputStreamReaderRunnable.InputStreamLineHandler errorStreamHandler)
     throws InterruptedException {
     ExecutorServiceShutter executorServiceShutter =
       executeInParallel(InputStreamReaderRunnable.init(process.getInputStream(), inputStreamHandler),
@@ -70,12 +71,12 @@ public class Executors {
     return new ExecutorServiceShutter(executorService, countDownLatch);
   }
 
-    public static void executeCommandAndWait(String command, File directory) throws IOException, InterruptedException {
-      Process process = executeCommand(command, directory);
-      processAll(process, InputStreamReaderRunnable.InputStreamLineHandler.NULL, InputStreamReaderRunnable.InputStreamLineHandler.NULL);
+  public static void executeCommandAndWait(String command, File directory) throws IOException, InterruptedException {
+    Process process = executeCommand(command, directory);
+    processAll(process, InputStreamReaderRunnable.InputStreamLineHandler.NULL, InputStreamReaderRunnable.InputStreamLineHandler.NULL);
   }
 
-    public static class ExecutorServiceShutter {
+  public static class ExecutorServiceShutter {
     private final ExecutorService executorServiceToShut;
     private final CountDownLatch countDownLatch;
 

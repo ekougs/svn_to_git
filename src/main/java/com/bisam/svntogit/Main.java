@@ -2,7 +2,10 @@ package com.bisam.svntogit;
 
 import com.bisam.svntogit.branchrepair.BranchesRepairer;
 import com.bisam.svntogit.clone.*;
-import com.bisam.svntogit.utils.*;
+import com.bisam.svntogit.utils.Executors;
+import com.bisam.svntogit.utils.InputStreamToOutputs;
+import com.bisam.svntogit.utils.Logs;
+import com.bisam.svntogit.utils.Strings;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
@@ -30,7 +33,7 @@ public class Main {
   }
 
   public static void launchGitRepoCreation(String[] args, MailSupplier mailSupplier)
-          throws IOException, InterruptedException {
+    throws IOException, InterruptedException {
     ArgumentsParser.Options options = ArgumentsParser.getOptions(args);
     launchGitRepoCreation(options, mailSupplier);
   }
@@ -61,13 +64,13 @@ public class Main {
     createBranches(gitRepo, options.getAllowedBranchesPath());
     logStep(stepStart, "Branches : ");
 
-    if(options.repairBranches()) {
+    if (options.repairBranches()) {
       stepStart = new Date().getTime();
       BranchesRepairer.repair(new File(gitRepo));
       logStep(stepStart, "Branches repair : ");
     }
 
-    logStep(start, "Total : " );
+    logStep(start, "Total : ");
   }
 
   static void createTags(String gitRepo) throws IOException, InterruptedException {
@@ -101,8 +104,17 @@ public class Main {
   private static void createBranches(String gitRepo, String allowedBranchesPath) throws IOException, InterruptedException {
     String branchListCommand = append("git for-each-ref --format=%(refname) ", BranchesCreator.PREFIX);
     File gitRepoFile = new File(gitRepo);
-    Executors.executeAll(branchListCommand, new BranchesCreator(gitRepo), ERROR_LOG, gitRepoFile);
-    NonAllowedBranchEraser.init(gitRepo, allowedBranchesPath).remove();
+    BranchesCreator branchesCreator = new BranchesCreator(gitRepo);
+    Executors.executeAll(branchListCommand, branchesCreator, ERROR_LOG, gitRepoFile);
+    if (Strings.isEmptyString(allowedBranchesPath)) {
+      return;
+    }
+    if (new File(allowedBranchesPath).exists()) {
+      NonAllowedBranchEraser.init(gitRepo, allowedBranchesPath, branchesCreator.getExistingBranches()).remove();
+    }
+    else {
+      Logs.appendln("Allowed branch file not found '", allowedBranchesPath, "'");
+    }
   }
 
   private static void deleteGitRepo(String gitRepo) throws IOException {
@@ -112,7 +124,7 @@ public class Main {
     }
   }
 
-  private static void logStep(long start, String step) {
+  static void logStep(long start, String step) {
     Logs.appendln();
     Logs.appendln(append(step, String.valueOf((new Date().getTime() - start) / 1000), " s"));
     Logs.appendln();

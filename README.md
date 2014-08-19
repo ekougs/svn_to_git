@@ -18,8 +18,10 @@ OPTIONAL
 
 --repair-branches : To use if first commit pointer of some of the branches points to nothing. This option automatically links branches to previous commit in time on master.
 
---allowed-branches : Provide a file path where are stored branches you want to keep in your git repo. Format is simple, one branch name per line
+--allowed-branches : Provide a file path where are stored branches you want to keep in your git repo. Format is simple, one branch name per line.
 
-Run "mvn clean package" to build the jar with dependencies which you can run.
+Run "mvn clean package" to build the jar (can be found in target/tools) with dependencies which you can run.
 
-It MUST be run with Java 7+ JVM.
+In target/tools, you will also find the branch repair tool which can be run alone. This one takes no argument.
+
+These tools MUST be run with Java 7+ JVM.
