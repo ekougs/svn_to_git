@@ -20,6 +20,7 @@ public class BufferedReaderIterable implements Iterable<String> {
     private final BufferedReader bufferedReader;
     private boolean nextLineRead = false;
     private String nextLine;
+    private boolean streamClosed;
 
     private BufferedReaderIterator(BufferedReader bufferedReader) {
       this.bufferedReader = bufferedReader;
@@ -27,25 +28,29 @@ public class BufferedReaderIterable implements Iterable<String> {
 
     @Override
     public boolean hasNext() {
+      boolean streamClosed = this.streamClosed;
       retrieveNextLineIfNecessary();
       nextLineRead = true;
-      return nextLine != null;
+      return !streamClosed && nextLine != null;
     }
 
     @Override
     public String next() {
       retrieveNextLineIfNecessary();
       nextLineRead = false;
+      String nextLine = this.nextLine;
+      this.nextLine = null;
       return nextLine;
     }
 
     private void retrieveNextLineIfNecessary() {
-      if (!nextLineRead) {
+      if (!nextLineRead && !streamClosed) {
         try {
           nextLine = bufferedReader.readLine();
         }
         catch (IOException e) {
-          throw new RuntimeException(e);
+          streamClosed = true;
+          nextLine = "Stream has been closed abruptly";
         }
       }
     }
