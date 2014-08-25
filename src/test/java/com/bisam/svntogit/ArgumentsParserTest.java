@@ -46,9 +46,9 @@ public class ArgumentsParserTest {
     assertEquals("repoquoi", options.getSvnRepo());
     assertEquals("gitquoi", options.getGitRepo());
     assertEquals("john@doe.com", options.getMail());
-      assertEquals("authorfilequoi", options.getAuthorsFilePath());
-      assertTrue(options.isAuthorsFileProvided());
-      assertTrue(options.repairBranches());
-      assertEquals("branchesautoriseesquoi", options.getAllowedBranchesPath());
+    assertEquals("authorfilequoi", options.getAuthorsFilePath());
+    assertTrue(options.isAuthorsFileProvided());
+    assertTrue(options.repairBranches());
+    assertEquals("branchesautoriseesquoi", options.getAllowedBranchesPath());
   }
 }

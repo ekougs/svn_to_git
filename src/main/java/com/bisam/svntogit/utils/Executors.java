@@ -106,8 +106,12 @@ public class Executors {
 
     @Override
     public void run() {
-      runnable.run();
-      countDownLatch.countDown();
+      try {
+        runnable.run();
+      }
+      finally {
+        countDownLatch.countDown();
+      }
     }
   }
 }

@@ -28,7 +28,7 @@ public class SvnLogWriter {
 
   private boolean writeSvnLog(File svnLog) throws IOException, InterruptedException {
     int exitValue = Executors.executeAll("svn log " + repository,
-                                         InputStreamToOutputs.init(svnLog).add(System.out),
+                                         InputStreamToOutputs.init(svnLog).addConsole(),
                                          ERROR_LOG);
     return exitValue == 0;
   }

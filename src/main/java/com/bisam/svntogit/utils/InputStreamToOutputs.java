@@ -19,7 +19,11 @@ public class InputStreamToOutputs implements InputStreamReaderRunnable.InputStre
   }
 
   public static InputStreamToOutputs getErrorStreamHandler(String errorLogFileName) throws IOException {
-    return init(new File(Files.getLocalFilePath(Main.class, errorLogFileName)));
+    return init(Files.getLocalFile(Main.class, errorLogFileName));
+  }
+
+  public InputStreamToOutputs addConsole() {
+    return add(System.out);
   }
 
   public InputStreamToOutputs add(PrintStream outputStream) {

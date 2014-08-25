@@ -25,26 +25,15 @@ public class TagsCreator implements InputStreamReaderRunnable.InputStreamLineHan
       Logs.appendln(tag, " ", committerName, " <", committerEmail, "> ", commitDate);
 
       String tagComment =
-        Strings.append("Tag: ",
-                       tag,
-                       " sha1: ",
-                       sha1,
-                       " using '",
-                       committerName,
-                       "' <",
-                       committerEmail,
-                       "> on ",
-                       commitDate);
+        Strings.append("Tag: ", tag, " sha1: ", sha1, " using '", committerName, "' <", committerEmail, "> on ", commitDate);
       Logs.appendln(tagComment);
       ProcessBuilder gitCreationCommandBuilder =
         new ProcessBuilder("git", "tag", "-a", tag, "-m", tagComment, sha1).directory(gitRepo);
-      Executors.processAll(gitCreationCommandBuilder.start(),
-                           NULL,
-                           InputStreamToOutputs.getErrorStreamHandler(ERROR_LOG));
+      Executors.processAll(gitCreationCommandBuilder.start(), NULL, InputStreamToOutputs.getErrorStreamHandler(ERROR_LOG));
 
       String updateRefTagCommand = Strings.append("git update-ref -d ", originalTagName);
       Logs.appendln(updateRefTagCommand);
-      getResult(updateRefTagCommand);
+      execute(updateRefTagCommand);
       Logs.appendln();
     }
     catch (IOException | InterruptedException e) {
@@ -59,8 +48,16 @@ public class TagsCreator implements InputStreamReaderRunnable.InputStreamLineHan
   private String getResult(String command)
     throws InterruptedException, IOException {
     InputStreamResultProvider resultProvider = new InputStreamResultProvider();
-    Executors.executeAll(command, resultProvider, ERROR_LOG, gitRepo);
+    execute(command, resultProvider);
     return resultProvider.getResult();
+  }
+
+  private void execute(String command) throws InterruptedException, IOException {
+    Executors.executeAll(command, NULL, ERROR_LOG, gitRepo);
+  }
+
+  private void execute(String command, InputStreamResultProvider resultProvider) throws InterruptedException, IOException {
+    Executors.executeAll(command, resultProvider, ERROR_LOG, gitRepo);
   }
 
 }

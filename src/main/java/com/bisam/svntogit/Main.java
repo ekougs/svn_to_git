@@ -94,7 +94,7 @@ public class Main {
       append("git svn clone --prefix=svn/ --no-metadata --authors-file=", options.getAuthorsFilePath(), " ", options.getSvnRepo(),
              " ", gitRepo, " --trunk=trunk --tags=tags --branches=branches");
 
-    Executors.executeAll(gitSvnCloneCommand, InputStreamToOutputs.init(new File(GIT_SVN_LOG)).add(System.out),
+    Executors.executeAll(gitSvnCloneCommand, InputStreamToOutputs.init(Files.getLocalFile(Main.class, GIT_SVN_LOG)).addConsole(),
                          ERROR_LOG);
   }
 

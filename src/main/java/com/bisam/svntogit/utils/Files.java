@@ -9,6 +9,10 @@ public class Files {
     return new File(filePath).exists();
   }
 
+  public static File getLocalFile(Class<?> baseClass, String fileName) {
+    return new File(getLocalFilePath(baseClass, fileName));
+  }
+
   public static String getLocalFilePath(Class<?> baseClass, String fileName) {
     String localDirectory = getLocalDirectory(baseClass);
     return localDirectory + File.separatorChar + fileName;

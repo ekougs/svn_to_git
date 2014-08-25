@@ -2,6 +2,8 @@ package com.bisam.svntogit.utils;
 
 import com.bisam.svntogit.FileTestCase;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -16,6 +18,7 @@ import static junit.framework.TestCase.assertEquals;
 import static org.junit.Assert.assertNull;
 
 public class BufferedReaderIterableTest {
+  private static final Logger LOG = LoggerFactory.getLogger(BufferedReaderIterableTest.class);
 
   @Test
   public void testStringBufferIsIterable() throws Exception {
@@ -34,16 +37,19 @@ public class BufferedReaderIterableTest {
     Path logPath = new File(log).toPath();
     Path logDirectory = logPath.getParent();
     Path logTempPath = logDirectory.resolve("log_temp.txt");
-    java.nio.file.Files.copy(logPath, logTempPath);
     File logTempFile = logTempPath.toFile();
+    if (!deleteLogTemp(logTempFile)) {
+      return;
+    }
+    java.nio.file.Files.copy(logPath, logTempPath);
     FileInputStream stream =
       new FileInputStream(logTempFile);
     BufferedReader logBufferedReader = new BufferedReader(new InputStreamReader(stream));
     BufferedReaderIterable bufferedReaderIterable =
       new BufferedReaderIterable(logBufferedReader);
 
-    while (logTempFile.exists()) {
-      logTempFile.delete();
+    if (!deleteLogTemp(logTempFile)) {
+      return;
     }
     stream.close();
 
@@ -52,5 +58,24 @@ public class BufferedReaderIterableTest {
     assertEquals("Stream has been closed abruptly", errorLogLine);
     assertFalse(bufferedReaderIterator.hasNext());
     assertNull(bufferedReaderIterator.next());
+  }
+
+  private boolean deleteLogTemp(File logTempFile) {
+    boolean deletionSucceeded = delete(logTempFile);
+    if (!deletionSucceeded) {
+      LOG.warn("Test could not be launched as log temp file could not be deleted.");
+    }
+    return deletionSucceeded;
+  }
+
+  private boolean delete(File logTempFile) {
+    int attempts = 0;
+    while (logTempFile.exists()) {
+      logTempFile.delete();
+      if (++attempts == 5) {
+        return false;
+      }
+    }
+    return true;
   }
 }

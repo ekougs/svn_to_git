@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.IOException;
 
 public class BranchesRepairer {
+  static final String BRANCHES_REPAIRER_LOG = "branch_repair.log";
   static final String BRANCHES_REPAIRER_ERROR = "branch_repair_error.log";
   private static final String TEMP = "_TEMP";
 
@@ -55,7 +56,8 @@ public class BranchesRepairer {
         String linkBranchToTrunkCommand =
           Strings.append(Gits.GIT_REBASE, tempBranch, " ", branchName);
         Logs.appendln(linkBranchToTrunkCommand);
-        Executors.executeAll(linkBranchToTrunkCommand, InputStreamToOutputs.initConsole(),
+        Executors.executeAll(linkBranchToTrunkCommand,
+                             InputStreamToOutputs.init(Files.getLocalFile(BranchRepairer.class, BRANCHES_REPAIRER_LOG)).addConsole(),
                              BRANCHES_REPAIRER_ERROR, gitRepository);
 
         String tempBranchDeletionCommand =
