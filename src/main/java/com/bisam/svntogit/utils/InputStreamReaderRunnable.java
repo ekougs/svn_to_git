@@ -4,48 +4,67 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.CyclicBarrier;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class InputStreamReaderRunnable implements Runnable {
-  private int numberOfRetry = 0;
-  private final InputStream inputStream;
+  private final BufferedReader inputBufferedReader;
+  private final BlockingQueue<String> inputStreamLines = new LinkedBlockingQueue<>();
+  private final ProcessEndNotifier processEndNotifier;
   private final InputStreamLineHandler inputStreamLineHandler;
+  private final CyclicBarrier barrier = new CyclicBarrier(2);
 
-  public static InputStreamReaderRunnable init(InputStream inputStream, InputStreamLineHandler inputStreamLineHandler) {
-    return new InputStreamReaderRunnable(inputStream, inputStreamLineHandler);
+  public static InputStreamReaderRunnable initForInput(Process process, InputStreamLineHandler inputStreamLineHandler) {
+    return new InputStreamReaderRunnable(process.getInputStream(), inputStreamLineHandler, process);
   }
 
-  private InputStreamReaderRunnable(InputStream inputStream, InputStreamLineHandler inputStreamLineHandler) {
-    this.inputStream = inputStream;
+  public static InputStreamReaderRunnable initForError(Process process, InputStreamLineHandler inputStreamLineHandler) {
+    return new InputStreamReaderRunnable(process.getErrorStream(), inputStreamLineHandler, process);
+  }
+
+  private InputStreamReaderRunnable(InputStream inputStream, InputStreamLineHandler inputStreamLineHandler, Process process) {
+    this.inputBufferedReader = new BufferedReader(new InputStreamReader(inputStream));
     this.inputStreamLineHandler = inputStreamLineHandler;
+    this.processEndNotifier = new ProcessEndNotifier(process);
   }
 
   @Override
   public void run() {
     try {
-      while (canBeRead(inputStream)) {
-        read();
-        numberOfRetry = 0;
-      }
+      Executors.ExecutorServiceShutter shutter = Executors.executeInParallel(new InputStreamConsumer(), processEndNotifier);
+      read();
+      shutter.waitForTasks().shutdown();
+      inputBufferedReader.close();
     }
     catch (IOException | InterruptedException e) {
-      e.printStackTrace();
       throw new RuntimeException(e);
     }
     inputStreamLineHandler.close();
   }
 
   private void read() throws IOException {
-    try (BufferedReader inputBufferedReader = new BufferedReader(new InputStreamReader(inputStream))) {
-      for (String nextLine : new BufferedReaderIterable(inputBufferedReader)) {
-        inputStreamLineHandler.handleLine(nextLine);
+    boolean keepReading = true;
+    while (keepReading) {
+      String nextLine = inputBufferedReader.readLine();
+      if (nextLine != null) {
+        inputStreamLines.offer(nextLine);
+        synchronized (inputStreamLines){
+          inputStreamLines.notifyAll();
+        }
+      }
+      else {
+        keepReading = !processEndNotifier.done;
       }
     }
   }
 
-  private boolean canBeRead(InputStream inputStream) throws InterruptedException {
+  private boolean canBeRead() {
     try {
-      Thread.sleep(50);
-      return inputStream.available() != 0 || ++numberOfRetry <= 3;
+      return inputBufferedReader.ready();
     }
     catch (IOException e) {
       return false;
@@ -66,5 +85,54 @@ public class InputStreamReaderRunnable implements Runnable {
       public void close() {
       }
     };
+  }
+
+  private class InputStreamConsumer implements Runnable {
+    @Override
+    public void run() {
+      boolean consume = true;
+      while (consume) {
+        try {
+          tryHandlingLine();
+        }
+        catch (InterruptedException e) {
+          Thread.currentThread().interrupt();
+          return;
+        }
+        consume = !processEndNotifier.done || !inputStreamLines.isEmpty();
+      }
+    }
+
+    private void tryHandlingLine() throws InterruptedException {
+      synchronized (inputStreamLines){
+        inputStreamLines.wait(200);
+      }
+      String inputStreamLine = inputStreamLines.poll();
+      if (inputStreamLine != null) {
+        inputStreamLineHandler.handleLine(inputStreamLine);
+      }
+    }
+  }
+
+  private static class ProcessEndNotifier implements Runnable {
+    private boolean done;
+    private final Process process;
+
+    private ProcessEndNotifier(Process process) {
+      this.process = process;
+    }
+
+    @Override
+    public void run() {
+      try {
+        process.waitFor();
+      }
+      catch (InterruptedException e) {
+        Thread.currentThread().interrupt();
+      }
+      finally {
+        done = true;
+      }
+    }
   }
 }

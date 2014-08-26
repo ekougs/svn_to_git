@@ -37,8 +37,8 @@ public class Executors {
                                InputStreamReaderRunnable.InputStreamLineHandler errorStreamHandler)
     throws InterruptedException {
     ExecutorServiceShutter executorServiceShutter =
-      executeInParallel(InputStreamReaderRunnable.init(process.getInputStream(), inputStreamHandler),
-                        InputStreamReaderRunnable.init(process.getErrorStream(), errorStreamHandler));
+      executeInParallel(InputStreamReaderRunnable.initForInput(process, inputStreamHandler),
+                        InputStreamReaderRunnable.initForError(process, errorStreamHandler));
 
     int processResult = process.waitFor();
     executorServiceShutter.waitForTasks().shutdown();
@@ -50,8 +50,8 @@ public class Executors {
     throws InterruptedException, IOException {
     Process process = executeCommand(command);
     ExecutorServiceShutter executorServiceShutter =
-      executeInParallel(InputStreamReaderRunnable.init(process.getInputStream(), inputStreamHandler),
-                        InputStreamReaderRunnable.init(process.getErrorStream(), errorStreamHandler));
+      executeInParallel(InputStreamReaderRunnable.initForInput(process, inputStreamHandler),
+                        InputStreamReaderRunnable.initForError(process, errorStreamHandler));
 
     int processResult = process.waitFor();
     executorServiceShutter.waitForTasks().shutdown();
