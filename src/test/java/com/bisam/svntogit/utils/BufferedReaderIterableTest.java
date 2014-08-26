@@ -34,24 +34,10 @@ public class BufferedReaderIterableTest {
   @Test
   public void testIterableInterruptedByStreamClosure() throws Exception {
     String log = BufferedReaderIterableTest.class.getResource("log.txt").getFile();
-    Path logPath = new File(log).toPath();
-    Path logDirectory = logPath.getParent();
-    Path logTempPath = logDirectory.resolve("log_temp.txt");
-    File logTempFile = logTempPath.toFile();
-    if (!deleteLogTemp(logTempFile)) {
-      return;
-    }
-    java.nio.file.Files.copy(logPath, logTempPath);
-    FileInputStream stream =
-      new FileInputStream(logTempFile);
+    FileInputStream stream = new FileInputStream(new File(log));
     BufferedReader logBufferedReader = new BufferedReader(new InputStreamReader(stream));
-    BufferedReaderIterable bufferedReaderIterable =
-      new BufferedReaderIterable(logBufferedReader);
-
-    if (!deleteLogTemp(logTempFile)) {
-      return;
-    }
-    stream.close();
+    BufferedReaderIterable bufferedReaderIterable = new BufferedReaderIterable(logBufferedReader);
+    logBufferedReader.close();
 
     Iterator<String> bufferedReaderIterator = bufferedReaderIterable.iterator();
     String errorLogLine = bufferedReaderIterator.next();
