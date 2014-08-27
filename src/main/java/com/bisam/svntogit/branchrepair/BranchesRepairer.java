@@ -1,17 +1,20 @@
 package com.bisam.svntogit.branchrepair;
 
 import com.bisam.svntogit.utils.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
 
 public class BranchesRepairer {
+  private static final Logger LOGGER = LoggerFactory.getLogger(BranchesRepairer.class);
   static final String BRANCHES_REPAIRER_LOG = "branch_repair.log";
   static final String BRANCHES_REPAIRER_ERROR = "branch_repair_error.log";
   private static final String TEMP = "_TEMP";
 
   public static void repair(File gitRepository) throws IOException, InterruptedException {
-    Logs.appendln(Gits.GIT_BRANCH_LIST_COMMAND);
+    LOGGER.debug(Gits.GIT_BRANCH_LIST_COMMAND);
     Executors.executeAll(Gits.GIT_BRANCH_LIST_COMMAND, new BranchRepairer(gitRepository),
                          BRANCHES_REPAIRER_ERROR, gitRepository);
   }
@@ -33,36 +36,36 @@ public class BranchesRepairer {
       try {
         String gitRevListWithoutParentCommand =
           Strings.append(Gits.GIT_REV_LIST_WITHOUT_PARENT_COMMAND, branchName);
-        Logs.appendln(gitRevListWithoutParentCommand);
+        LOGGER.debug(gitRevListWithoutParentCommand);
         InputStreamResultProvider branchCommitAncestorSHA1Provider = new InputStreamResultProvider();
         Executors.executeAll(gitRevListWithoutParentCommand, branchCommitAncestorSHA1Provider,
                              BRANCHES_REPAIRER_ERROR, gitRepository);
 
         String ancestorSHA1 = branchCommitAncestorSHA1Provider.getResult();
-        Logs.appendln(branchName, " ancestor SHA1 : ", ancestorSHA1);
+        LOGGER.debug(branchName, " ancestor SHA1 : ", ancestorSHA1);
         if (isPluggedToMaster(branchName, ancestorSHA1)) {
-          Logs.appendln(branchName, "(", ancestorSHA1, ")", " is plugged to master");
+          LOGGER.debug(branchName, "(", ancestorSHA1, ")", " is plugged to master");
           return;
         }
         String previousSHA1 = getPreviousSHA1OnMaster(branchName, ancestorSHA1);
-        Logs.appendln(branchName, " previous SHA1 : ", previousSHA1);
+        LOGGER.debug(branchName, " previous SHA1 : ", previousSHA1);
 
         String tempBranch = Strings.append(branchName, TEMP);
         String tempBranchCreationFromSHA1Command =
           Strings.append(Gits.GIT_CHECKOUT_WITH_SHA1, tempBranch, " ", previousSHA1);
-        Logs.appendln(tempBranchCreationFromSHA1Command);
+        LOGGER.debug(tempBranchCreationFromSHA1Command);
         Executors.executeCommandAndWait(tempBranchCreationFromSHA1Command, gitRepository);
 
         String linkBranchToTrunkCommand =
           Strings.append(Gits.GIT_REBASE, tempBranch, " ", branchName);
-        Logs.appendln(linkBranchToTrunkCommand);
+        LOGGER.debug(linkBranchToTrunkCommand);
         Executors.executeAll(linkBranchToTrunkCommand,
                              InputStreamToOutputs.init(Files.getLocalFile(BranchRepairer.class, BRANCHES_REPAIRER_LOG)).addConsole(),
                              BRANCHES_REPAIRER_ERROR, gitRepository);
 
         String tempBranchDeletionCommand =
           Strings.append(Gits.GIT_BRANCH_DELETION, tempBranch);
-        Logs.appendln(tempBranchDeletionCommand);
+        LOGGER.debug(tempBranchDeletionCommand);
         Executors.executeCommandAndWait(tempBranchDeletionCommand, gitRepository);
       }
       catch (InterruptedException | IOException e) {

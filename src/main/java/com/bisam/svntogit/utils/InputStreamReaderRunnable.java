@@ -8,8 +8,6 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 public class InputStreamReaderRunnable implements Runnable {
   private final BufferedReader inputBufferedReader;
@@ -52,9 +50,6 @@ public class InputStreamReaderRunnable implements Runnable {
       String nextLine = inputBufferedReader.readLine();
       if (nextLine != null) {
         inputStreamLines.offer(nextLine);
-        synchronized (inputStreamLines){
-          inputStreamLines.notifyAll();
-        }
       }
       else {
         keepReading = !processEndNotifier.done;
@@ -104,10 +99,7 @@ public class InputStreamReaderRunnable implements Runnable {
     }
 
     private void tryHandlingLine() throws InterruptedException {
-      synchronized (inputStreamLines){
-        inputStreamLines.wait(200);
-      }
-      String inputStreamLine = inputStreamLines.poll();
+      String inputStreamLine = inputStreamLines.poll(50, TimeUnit.MILLISECONDS);
       if (inputStreamLine != null) {
         inputStreamLineHandler.handleLine(inputStreamLine);
       }

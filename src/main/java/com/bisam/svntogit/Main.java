@@ -2,8 +2,13 @@ package com.bisam.svntogit;
 
 import com.bisam.svntogit.branchrepair.BranchesRepairer;
 import com.bisam.svntogit.clone.*;
-import com.bisam.svntogit.utils.*;
+import com.bisam.svntogit.utils.Executors;
+import com.bisam.svntogit.utils.Files;
+import com.bisam.svntogit.utils.InputStreamToOutputs;
+import com.bisam.svntogit.utils.Strings;
 import org.apache.commons.io.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -13,6 +18,7 @@ import static com.bisam.svntogit.utils.Strings.append;
 import static com.bisam.svntogit.utils.Strings.isEmptyString;
 
 public class Main {
+  private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
   private static final String ERROR_LOG = "error_main.log";
   private static final String GIT_SVN_LOG = "git_svn.log";
 
@@ -110,7 +116,7 @@ public class Main {
       NonAllowedBranchEraser.init(gitRepo, allowedBranchesPath, branchesCreator.getExistingBranches()).remove();
     }
     else {
-      Logs.appendln("Allowed branch file not found '", allowedBranchesPath, "'");
+      LOGGER.debug("Allowed branch file not found '", allowedBranchesPath, "'");
     }
   }
 
@@ -122,8 +128,8 @@ public class Main {
   }
 
   static void logStep(long start, String step) {
-    Logs.appendln();
-    Logs.appendln(append(step, String.valueOf((new Date().getTime() - start) / 1000), " s"));
-    Logs.appendln();
+    LOGGER.debug("");
+    LOGGER.debug(append(step, String.valueOf((new Date().getTime() - start) / 1000), " s"));
+    LOGGER.debug("");
   }
 }

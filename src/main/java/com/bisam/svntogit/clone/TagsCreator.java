@@ -1,11 +1,14 @@
 package com.bisam.svntogit.clone;
 
 import com.bisam.svntogit.utils.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
 
 public class TagsCreator implements InputStreamReaderRunnable.InputStreamLineHandler {
+  private static final Logger LOGGER = LoggerFactory.getLogger(TagsCreator.class);
   public static final String PREFIX = "refs/remotes/svn/tags/";
   private static final String ERROR_LOG = "error_tags.log";
   private final File gitRepo;
@@ -22,19 +25,19 @@ public class TagsCreator implements InputStreamReaderRunnable.InputStreamLineHan
       String committerEmail = getResult("git show -s --pretty=format:%ae " + originalTagName);
       String commitDate = getResult("git show -s --pretty=format:%ad " + originalTagName);
       String sha1 = getResult("git rev-parse " + originalTagName);
-      Logs.appendln(tag, " ", committerName, " <", committerEmail, "> ", commitDate);
+      LOGGER.debug(tag, " ", committerName, " <", committerEmail, "> ", commitDate);
 
       String tagComment =
         Strings.append("Tag: ", tag, " sha1: ", sha1, " using '", committerName, "' <", committerEmail, "> on ", commitDate);
-      Logs.appendln(tagComment);
+      LOGGER.debug(tagComment);
       ProcessBuilder gitCreationCommandBuilder =
         new ProcessBuilder("git", "tag", "-a", tag, "-m", tagComment, sha1).directory(gitRepo);
       Executors.processAll(gitCreationCommandBuilder.start(), NULL, InputStreamToOutputs.getErrorStreamHandler(ERROR_LOG));
 
       String updateRefTagCommand = Strings.append("git update-ref -d ", originalTagName);
-      Logs.appendln(updateRefTagCommand);
+      LOGGER.debug(updateRefTagCommand);
       execute(updateRefTagCommand);
-      Logs.appendln();
+      LOGGER.debug("");
     }
     catch (IOException | InterruptedException e) {
       throw new RuntimeException(e);

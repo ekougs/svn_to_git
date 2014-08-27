@@ -2,8 +2,9 @@ package com.bisam.svntogit.clone;
 
 import com.bisam.svntogit.utils.Executors;
 import com.bisam.svntogit.utils.InputStreamReaderRunnable;
-import com.bisam.svntogit.utils.Logs;
 import com.bisam.svntogit.utils.Strings;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -13,6 +14,7 @@ import java.util.Collections;
 import java.util.List;
 
 public class BranchesCreator implements InputStreamReaderRunnable.InputStreamLineHandler {
+  private static final Logger LOGGER = LoggerFactory.getLogger(BranchesCreator.class);
   public static final String PREFIX = "refs/remotes/svn/";
   private static final String TRUNK = "refs/remotes/svn/trunk";
   private final File gitRepo;
@@ -47,7 +49,7 @@ public class BranchesCreator implements InputStreamReaderRunnable.InputStreamLin
 
   private void deleteSvnTrunkBranch(String originalBranch) {
     String gitDeleteTrunkCommand = Strings.append("git branch -D ", originalBranch);
-    Logs.appendln(gitDeleteTrunkCommand);
+    LOGGER.debug(gitDeleteTrunkCommand);
     try {
       Executors.executeCommand(gitDeleteTrunkCommand, gitRepo).waitFor();
     }
@@ -58,12 +60,12 @@ public class BranchesCreator implements InputStreamReaderRunnable.InputStreamLin
 
   private void createBranch(String branch, String originalBranch) throws InterruptedException, IOException {
     String gitBranchCommand = Strings.append("git branch -t ", branch, " ", originalBranch);
-    Logs.appendln(gitBranchCommand);
+    LOGGER.debug(gitBranchCommand);
     Executors.executeCommand(gitBranchCommand, gitRepo).waitFor();
     String updateRefTagCommand = Strings.append("git update-ref -d ", originalBranch);
-    Logs.appendln(updateRefTagCommand);
+    LOGGER.debug(updateRefTagCommand);
     Executors.executeCommand(updateRefTagCommand, gitRepo).waitFor();
     branches.add(branch);
-    Logs.appendln();
+    LOGGER.debug("");
   }
 }

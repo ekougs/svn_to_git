@@ -1,6 +1,11 @@
 package com.bisam.svntogit.clone;
 
-import com.bisam.svntogit.utils.*;
+import com.bisam.svntogit.utils.BufferedReaderIterable;
+import com.bisam.svntogit.utils.Executors;
+import com.bisam.svntogit.utils.Gits;
+import com.bisam.svntogit.utils.Strings;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.util.Collection;
@@ -8,6 +13,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class NonAllowedBranchEraser {
+  private static final Logger LOGGER = LoggerFactory.getLogger(NonAllowedBranchEraser.class);
   private static final String ERROR_LOG = "error_branch_eraser.log";
   private final File gitRepoFile;
   private final String allowedBranchesPath;
@@ -30,7 +36,7 @@ public class NonAllowedBranchEraser {
       for (String branch : new BufferedReaderIterable(allowedBranchesBufferedReader)) {
         String branchName = branch.trim();
         if (existingBranches.contains(branchName)) {
-          Logs.appendln("Branch has been allowed ", branchName);
+          LOGGER.debug("Branch has been allowed ", branchName);
           allowedBranches.add(branchName);
         }
         else {
@@ -49,17 +55,17 @@ public class NonAllowedBranchEraser {
         branchDeletionCommandBuilder.append(branchToDelete).append(" ");
       }
       String branchDeletionCommand = branchDeletionCommandBuilder.toString();
-      Logs.appendln(branchDeletionCommand);
+      LOGGER.debug(branchDeletionCommand);
       Executors.executeCommandAndWait(branchDeletionCommand, gitRepoFile);
     }
     catch (FileNotFoundException e) {
-      Logs.appendln("Exception : No file found for allowedBranches : '", allowedBranchesPath, "'");
+      LOGGER.debug("Exception : No file found for allowedBranches : '", allowedBranchesPath, "'");
     }
   }
 
   private void logIncorrectFile(String... error) {
-    Logs.appendln(error);
-    Logs.appendln("Existing branches : ", existingBranches.toString());
+    LOGGER.debug(Strings.append(error));
+    LOGGER.debug("Existing branches : ", existingBranches.toString());
   }
 
   private static class NonAllowedBranchesRetriever implements Gits.BranchConsumer {
@@ -74,7 +80,7 @@ public class NonAllowedBranchEraser {
     @Override
     public void consume(String branchName) {
       if (canBeDeleted(branchName)) {
-        Logs.appendln("Branch '", branchName, "' will be deleted");
+        LOGGER.debug("Branch '", branchName, "' will be deleted");
         branchesToDelete.add(branchName);
       }
     }

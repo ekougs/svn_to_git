@@ -1,6 +1,11 @@
 package com.bisam.svntogit.branchrepair;
 
-import com.bisam.svntogit.utils.*;
+import com.bisam.svntogit.utils.Executors;
+import com.bisam.svntogit.utils.Gits;
+import com.bisam.svntogit.utils.InputStreamReaderRunnable;
+import com.bisam.svntogit.utils.Strings;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -10,6 +15,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 class BranchesSHA1s {
+  private static final Logger LOGGER = LoggerFactory.getLogger(BranchesSHA1s.class);
   private final HashMap<String, SHA1s> branchesRevisions = new HashMap<>();
 
   static BranchesSHA1s get(File gitRepository) throws IOException, InterruptedException {
@@ -127,7 +133,7 @@ class BranchesSHA1s {
       try {
         SHA1sLoader sha1sLoader = new SHA1sLoader();
         String branchRevListCommand = Strings.append(Gits.GIT_LOG_SHA1_COMMIT_DATE_BRANCH_COMMAND, branchName);
-        Logs.appendln(branchRevListCommand);
+        LOGGER.debug(branchRevListCommand);
         Executors.executeAll(branchRevListCommand,
                              sha1sLoader,
                              BranchesRepairer.BRANCHES_REPAIRER_ERROR,
@@ -153,7 +159,9 @@ class BranchesSHA1s {
       String[] logLineElements = logLine.split(";");
       try {
         String sha1 = logLineElements[0].trim();
-        Date sha1Date = ISO_8601_FORMAT.parse(logLineElements[1].trim());
+        String formattedDate = logLineElements[1].trim();
+        Date sha1Date = ISO_8601_FORMAT.parse(formattedDate);
+        LOGGER.debug(Strings.append("Adding SHA1 : ", sha1, " on ", formattedDate));
         sha1s.add(sha1, sha1Date);
       }
       catch (ParseException e) {
