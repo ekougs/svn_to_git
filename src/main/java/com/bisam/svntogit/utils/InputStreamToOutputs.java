@@ -36,7 +36,7 @@ public class InputStreamToOutputs implements InputStreamReaderRunnable.InputStre
   }
 
   private InputStreamToOutputs() {
-    this.outputStreams.add(System.out);
+    addConsole();
   }
 
   private PrintWriter getPrintWriter(File fileForWriting) throws IOException {
