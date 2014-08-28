@@ -44,7 +44,7 @@ public class BranchesRepairer {
         String ancestorSHA1 = branchCommitAncestorSHA1Provider.getResult();
         LOGGER.debug(Strings.append(branchName, " ancestor SHA1 : ", ancestorSHA1));
         if (isPluggedToMaster(branchName, ancestorSHA1)) {
-          LOGGER.debug(Strings.append(branchName, "(", ancestorSHA1, ")", " is plugged to master"));
+          LOGGER.debug(Strings.append(branchName, "(", ancestorSHA1, ")", " is plugge=.eknsd to master"));
           return;
         }
         String previousSHA1 = getPreviousSHA1OnMaster(branchName, ancestorSHA1);
