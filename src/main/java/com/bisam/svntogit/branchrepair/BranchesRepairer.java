@@ -42,13 +42,13 @@ public class BranchesRepairer {
                              BRANCHES_REPAIRER_ERROR, gitRepository);
 
         String ancestorSHA1 = branchCommitAncestorSHA1Provider.getResult();
-        LOGGER.debug(branchName, " ancestor SHA1 : ", ancestorSHA1);
+        LOGGER.debug(Strings.append(branchName, " ancestor SHA1 : ", ancestorSHA1));
         if (isPluggedToMaster(branchName, ancestorSHA1)) {
-          LOGGER.debug(branchName, "(", ancestorSHA1, ")", " is plugged to master");
+          LOGGER.debug(Strings.append(branchName, "(", ancestorSHA1, ")", " is plugged to master"));
           return;
         }
         String previousSHA1 = getPreviousSHA1OnMaster(branchName, ancestorSHA1);
-        LOGGER.debug(branchName, " previous SHA1 : ", previousSHA1);
+        LOGGER.debug(Strings.append(branchName, " previous SHA1 : ", previousSHA1));
 
         String tempBranch = Strings.append(branchName, TEMP);
         String tempBranchCreationFromSHA1Command =
